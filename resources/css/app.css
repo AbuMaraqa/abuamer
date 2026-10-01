@@ -3,7 +3,66 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+/*
+ * Nasaq design tokens: warm stone neutrals with a brass accent.
+ * Font families are self-hosted by the Vite fonts plugin (see vite.config.js),
+ * which exposes them as --font-body, --font-display-latin and --font-display-arabic.
+ */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-display-latin), var(--font-display-arabic), ui-serif, Georgia, serif;
+
+    --color-ink: #1d1b18;
+    --color-ink-soft: #3b3732;
+    --color-muted: #6f685f;
+    --color-line: #e3ddd4;
+
+    --color-sand-50: #fbfaf8;
+    --color-sand-100: #f5f2ed;
+    --color-sand-200: #ece6dd;
+    --color-sand-300: #ddd4c7;
+    --color-sand-400: #c7baa8;
+
+    --color-brass-300: #cdb38f;
+    --color-brass-400: #b8966b;
+    --color-brass-500: #a07d52;
+    --color-brass-600: #876843;
+    --color-brass-700: #6c5336;
+
+    --color-danger: #b4432f;
+    --color-success: #3f7a52;
+
+    --ease-elegant: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+    html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    body {
+        @apply bg-sand-50 font-sans text-ink;
+    }
+
+    /* Arabic script connects its letters, so tracking must never be applied to it. */
+    [dir='rtl'] {
+        letter-spacing: 0;
+    }
+
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-brass-500;
+    }
+
+    ::selection {
+        @apply bg-brass-300/50 text-ink;
+    }
+}
+
+@layer components {
+    /* Small uppercase label; tracked and uppercased only for Latin script. */
+    .eyebrow {
+        @apply text-xs font-medium text-brass-600 ltr:tracking-[0.2em] ltr:uppercase;
+    }
 }

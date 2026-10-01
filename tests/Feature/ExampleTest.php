@@ -1,7 +1,9 @@
 <?php
 
-test('the application returns a successful response', function () {
+test('the application redirects the root URL to the Arabic home page', function () {
+    $this->useRoutingLocale(null);
+
     $response = $this->get('/');
 
-    $response->assertStatus(200);
+    $response->assertRedirect(url('ar'));
 });
