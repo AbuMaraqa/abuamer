@@ -48,6 +48,7 @@ class UpdateSettingsRequest extends FormRequest
             'site.default_locale' => ['required', Rule::in(config('translatable.locales'))],
             'site.maintenance_mode' => ['required', 'boolean'],
             'site.font' => ['required', Rule::enum(SiteFont::class)],
+            'site.show_name_with_logo' => ['required', 'boolean'],
 
             // SVG is not accepted: it can carry scripts and would be served from the site's origin.
             'logo' => ['nullable', 'image', 'mimes:png,webp', 'max:2048', 'dimensions:min_width=120,min_height=40'],

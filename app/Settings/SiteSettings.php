@@ -22,6 +22,12 @@ class SiteSettings extends Settings
      */
     public string $font;
 
+    /**
+     * Whether the company name is written next to an uploaded logo. Turned off for
+     * logos that already contain the name.
+     */
+    public bool $show_name_with_logo;
+
     public static function group(): string
     {
         return 'site';

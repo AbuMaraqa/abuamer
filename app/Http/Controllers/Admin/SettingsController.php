@@ -64,6 +64,7 @@ class SettingsController extends Controller
             'default_locale' => $request->validated('site.default_locale'),
             'maintenance_mode' => $request->boolean('site.maintenance_mode'),
             'font' => $request->validated('site.font'),
+            'show_name_with_logo' => $request->boolean('site.show_name_with_logo'),
         ])->save();
 
         $company = Company::current();

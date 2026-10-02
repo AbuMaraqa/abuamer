@@ -110,6 +110,7 @@ class HandleInertiaRequests extends Middleware
     {
         $company = Company::current();
         $contact = app(ContactSettings::class);
+        $siteSettings = app(SiteSettings::class);
         $tree = app(CategoryTreeService::class)->tree();
 
         return [
@@ -118,8 +119,9 @@ class HandleInertiaRequests extends Middleware
             'logo' => $company->getFirstMediaUrl(Company::LOGO_COLLECTION) ?: null,
             'logoLight' => $company->getFirstMediaUrl(Company::LOGO_LIGHT_COLLECTION) ?: null,
             'logoIsTransparent' => $company->logoIsTransparent(),
+            'showNameWithLogo' => $siteSettings->show_name_with_logo,
             'favicon' => $company->getFirstMediaUrl(Company::FAVICON_COLLECTION) ?: null,
-            'font' => app(SiteSettings::class)->font()->value,
+            'font' => $siteSettings->font()->value,
             'contact' => [
                 'phone' => $contact->phone ?: null,
                 'mobile' => $contact->mobile ?: null,

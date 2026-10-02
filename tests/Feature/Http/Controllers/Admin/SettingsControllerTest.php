@@ -11,6 +11,7 @@ use App\Settings\SocialSettings;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
 
 /**
  * @param  array<string, mixed>  $overrides
@@ -36,7 +37,7 @@ function settingsPayload(array $overrides = []): array
             'meta_description' => ['ar' => '', 'en' => ''],
             'meta_keywords' => ['ar' => '', 'en' => ''],
         ],
-        'site' => ['default_locale' => 'en', 'maintenance_mode' => false, 'font' => 'tajawal'],
+        'site' => ['default_locale' => 'en', 'maintenance_mode' => false, 'font' => 'tajawal', 'show_name_with_logo' => true],
     ], $overrides);
 }
 
@@ -51,6 +52,17 @@ it('saves every settings group, keeping empty fields as empty text', function ()
         ->and(app(SocialSettings::class)->links())->toBe(['instagram' => 'https://instagram.com/nasaq'])
         ->and(app(SiteSettings::class)->default_locale)->toBe('en')
         ->and(app(SiteSettings::class)->font())->toBe(SiteFont::Tajawal);
+});
+
+it('shows the company name next to the logo until it is turned off', function () {
+    $this->get(route('home'))->assertInertia(fn (Assert $page) => $page->where('site.showNameWithLogo', true));
+
+    $response = $this->actingAs(admin())->put(route('admin.settings.update'), settingsPayload([
+        'site' => ['show_name_with_logo' => false],
+    ]));
+
+    $response->assertSessionHasNoErrors();
+    $this->get(route('home'))->assertInertia(fn (Assert $page) => $page->where('site.showNameWithLogo', false));
 });
 
 it('uses the chosen font on the website', function () {

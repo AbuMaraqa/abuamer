@@ -34,6 +34,7 @@ const tabs = [
 const activeTab = ref('branding');
 
 const brandingFields = ['logo', 'logo_light', 'favicon'];
+const brandingErrorKeys = [...brandingFields, 'site.show_name_with_logo'];
 
 const form = useForm({
     ...JSON.parse(JSON.stringify(props.settings)),
@@ -44,7 +45,7 @@ const networks = ['facebook', 'instagram', 'youtube', 'tiktok', 'linkedin', 'x']
 const localeOptions = locales.map(({ code, native }) => ({ value: code, label: native }));
 
 const tabsWithErrors = computed(
-    () => new Set(Object.keys(form.errors).map((key) => (brandingFields.includes(key) ? 'branding' : key.split('.')[0]))),
+    () => new Set(Object.keys(form.errors).map((key) => (brandingErrorKeys.includes(key) ? 'branding' : key.split('.')[0]))),
 );
 
 function submit() {
@@ -130,6 +131,14 @@ function submit() {
                     accept="image/png"
                     contain
                     :hint="t('A square PNG, at least 48 × 48 pixels.')"
+                />
+            </div>
+
+            <div class="rounded-2xl border border-line bg-white p-5 md:col-span-3">
+                <ToggleSwitch
+                    v-model="form.site.show_name_with_logo"
+                    :label="t('Show the company name next to the logo')"
+                    :description="t('Turn it off when the logo already contains the company name.')"
                 />
             </div>
         </section>
