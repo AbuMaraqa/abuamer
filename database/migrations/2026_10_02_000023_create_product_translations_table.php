@@ -26,7 +26,6 @@ return new class extends Migration
 
             $table->unique(['product_id', 'locale']);
             $table->unique(['locale', 'slug']);
-            $table->index(['locale', 'name']);
         });
     }
 

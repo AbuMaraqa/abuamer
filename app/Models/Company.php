@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\CompanyProfile;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -49,13 +50,17 @@ class Company extends Model implements HasMedia, TranslatableContract
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::saved(fn () => app(CompanyProfile::class)->forget());
+    }
+
     /**
-     * The company profile, created on first use if the row is missing.
+     * The company profile (loaded once per request), created on first use if the row is missing.
      */
     public static function current(): self
     {
-        return static::query()->with(['translations', 'media'])->find(1)
-            ?? static::query()->forceCreate(['id' => 1]);
+        return app(CompanyProfile::class)->get();
     }
 
     public function registerMediaCollections(): void

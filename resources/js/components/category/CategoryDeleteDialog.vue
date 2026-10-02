@@ -1,5 +1,5 @@
 <script setup>
-import { router } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import { subtreeStats } from '../../composables/useCategoryTree';
@@ -56,7 +56,10 @@ function destroy() {
         <div class="flex flex-col gap-4 text-sm text-ink-soft">
             <div v-if="stats.products > 0" class="flex gap-3 rounded-xl bg-danger/5 p-4 text-danger">
                 <Icon name="alert" class="shrink-0" />
-                <p>{{ t('This category contains :count products (including its subcategories). Move them to another category before deleting it.', { count: stats.products }) }}</p>
+                <div class="flex flex-col gap-2">
+                    <p>{{ t('This category contains :count products (including its subcategories). Move them to another category before deleting it.', { count: stats.products }) }}</p>
+                    <Link :href="route('admin.products.index', { category: node.id })" class="font-medium underline">{{ t('View these products') }}</Link>
+                </div>
             </div>
 
             <template v-else>

@@ -145,6 +145,9 @@ onMounted(() => {
                 <DropdownItem v-if="tree.can.update" :icon="node.status ? 'eye-off' : 'eye'" @select="tree.toggleStatus(node)">
                     {{ node.status ? t('Hide from website') : t('Show on website') }}
                 </DropdownItem>
+                <DropdownItem v-if="$page.props.auth.user.can['products.view']" icon="box" :href="route('admin.products.index', { category: node.id })">
+                    {{ t('View products') }}
+                </DropdownItem>
                 <DropdownItem v-if="node.status && !ancestorHidden" icon="globe" :href="node.url" external>
                     {{ t('View on website') }}
                 </DropdownItem>

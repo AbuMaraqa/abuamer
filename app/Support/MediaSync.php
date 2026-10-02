@@ -22,6 +22,8 @@ final class MediaSync
         } elseif ($remove) {
             $model->clearMediaCollection($collection);
         }
+
+        $model->unsetRelation('media');
     }
 
     /**
