@@ -85,6 +85,27 @@
         @apply opacity-100 underline decoration-brass-400 decoration-2 underline-offset-8;
     }
 
+    /* Mobile navigation drawer: large display links separated by hairlines. */
+    .drawer-link {
+        @apply flex items-center gap-3 border-b border-line py-4 font-display text-2xl text-ink transition-colors;
+    }
+
+    .drawer-link-active {
+        @apply text-brass-700 before:size-1.5 before:shrink-0 before:rounded-full before:bg-brass-500 before:content-[''];
+    }
+
+    /*
+     * Save and cancel buttons of the long control panel forms. Below the desktop layout they stay
+     * docked at the bottom of the screen; the form reserves room for them (.form-with-actions).
+     */
+    .form-actions {
+        @apply flex gap-3 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-20 max-lg:border-t max-lg:border-line max-lg:bg-white/95 max-lg:px-4 max-lg:py-3 max-lg:shadow-[0_-12px_24px_-16px_rgb(29_27_24/0.25)] max-lg:backdrop-blur-md;
+    }
+
+    .form-with-actions {
+        @apply max-lg:pb-20;
+    }
+
     /* Category tree drag & drop (SortableJS classes). */
     .category-ghost > div {
         @apply rounded-lg border border-dashed border-brass-400 bg-brass-300/15;

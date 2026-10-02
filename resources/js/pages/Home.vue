@@ -1,7 +1,7 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import CategoryCard from '../components/category/CategoryCard.vue';
+import CategoryGrid from '../components/category/CategoryGrid.vue';
 import Icon from '../components/common/Icon.vue';
 import ProductGrid from '../components/products/ProductGrid.vue';
 import CtaSection from '../components/sections/CtaSection.vue';
@@ -42,12 +42,12 @@ const { t } = useTranslations();
         />
         <div class="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/45 to-ink/25" aria-hidden="true" />
 
-        <div class="mx-auto w-full max-w-7xl px-4 pt-40 pb-20 sm:px-6 lg:px-8 lg:pb-28">
+        <div class="mx-auto w-full max-w-7xl px-4 pt-36 pb-16 sm:px-6 sm:pb-20 lg:px-8 lg:pb-28">
             <p v-if="company.tagline" class="eyebrow text-brass-300">{{ company.tagline }}</p>
-            <h1 class="mt-5 max-w-4xl font-display text-5xl leading-[1.08] sm:text-6xl lg:text-7xl">
+            <h1 class="mt-5 max-w-4xl font-display text-4xl leading-[1.1] text-balance sm:text-6xl lg:text-7xl">
                 {{ company.hero_title || company.name }}
             </h1>
-            <p v-if="company.hero_subtitle" class="mt-6 max-w-xl text-lg leading-relaxed text-white/80">{{ company.hero_subtitle }}</p>
+            <p v-if="company.hero_subtitle" class="mt-5 max-w-xl text-base leading-relaxed text-white/80 sm:mt-6 sm:text-lg">{{ company.hero_subtitle }}</p>
 
             <div class="mt-10 flex flex-col gap-3 sm:flex-row">
                 <Link :href="route('products.index')" class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-7 py-4 text-sm font-medium text-ink transition-colors hover:bg-sand-100">
@@ -62,10 +62,14 @@ const { t } = useTranslations();
     </section>
 
     <!-- About -->
-    <section v-if="company.introduction" class="mx-auto grid max-w-7xl items-center gap-14 px-4 py-24 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8 lg:py-32">
+    <section v-if="company.introduction" class="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:gap-14 sm:px-6 sm:py-24 lg:grid-cols-2 lg:gap-20 lg:px-8 lg:py-32">
         <div class="relative">
-            <div class="absolute -inset-3 translate-x-6 translate-y-6 rounded-2xl border border-brass-300/70 rtl:-translate-x-6" aria-hidden="true" />
-            <div class="relative aspect-[4/5] overflow-hidden rounded-2xl bg-sand-200">
+            <!-- The offset frame stays inside the page padding on small screens; the wide offset needs the two-column layout's gap. -->
+            <div
+                class="absolute inset-0 translate-x-3 translate-y-3 rounded-2xl border border-brass-300/70 rtl:-translate-x-3 lg:-inset-3 lg:translate-x-6 lg:translate-y-6 lg:rtl:-translate-x-6"
+                aria-hidden="true"
+            />
+            <div class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-sand-200 lg:aspect-[4/5]">
                 <img v-if="company.about_image" :src="company.about_image.large" alt="" loading="lazy" class="h-full w-full object-cover" />
             </div>
             <div v-if="company.founded_year" class="absolute start-6 bottom-6 rounded-xl bg-white/95 px-5 py-4 shadow-xl shadow-ink/10 backdrop-blur">
@@ -76,8 +80,8 @@ const { t } = useTranslations();
 
         <div>
             <p class="eyebrow">{{ t('About us') }}</p>
-            <h2 class="mt-3 font-display text-4xl leading-tight text-ink sm:text-5xl">{{ company.name }}</h2>
-            <p class="mt-6 text-lg leading-relaxed whitespace-pre-line text-muted">{{ company.introduction }}</p>
+            <h2 class="mt-3 font-display text-3xl leading-tight text-balance text-ink sm:text-5xl">{{ company.name }}</h2>
+            <p class="mt-5 text-base leading-relaxed whitespace-pre-line text-muted sm:mt-6 sm:text-lg">{{ company.introduction }}</p>
             <Link :href="route('about')" class="group mt-8 inline-flex items-center gap-2 text-sm font-medium text-ink">
                 <span class="border-b border-brass-400 pb-1">{{ t('Discover our story') }}</span>
                 <Icon name="arrow-right" :size="16" class="transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
@@ -87,7 +91,7 @@ const { t } = useTranslations();
 
     <!-- Collections -->
     <section v-if="collections.length > 0" class="border-y border-line bg-white">
-        <div class="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
             <SectionHeading :eyebrow="t('Collections')" :title="t('Designed for every space')">
                 <Link :href="route('products.index')" class="inline-flex items-center gap-2 text-sm font-medium text-ink hover:text-brass-700">
                     {{ t('All products') }}
@@ -95,26 +99,24 @@ const { t } = useTranslations();
                 </Link>
             </SectionHeading>
 
-            <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-                <CategoryCard v-for="collection in collections" :key="collection.id" :category="collection" />
-            </div>
+            <CategoryGrid class="mt-8 sm:mt-12" :categories="collections" />
         </div>
     </section>
 
     <!-- Featured products -->
-    <section v-if="featuredProducts.length > 0" class="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+    <section v-if="featuredProducts.length > 0" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <SectionHeading :eyebrow="t('Featured')" :title="t('Selected for you')" />
-        <ProductGrid class="mt-12" :products="featuredProducts" />
+        <ProductGrid class="mt-8 sm:mt-12" :products="featuredProducts" />
     </section>
 
     <!-- Why Nasaq + statistics -->
     <section v-if="features.length > 0 || statistics.length > 0" class="bg-ink">
-        <div class="mx-auto flex max-w-7xl flex-col gap-16 px-4 py-24 sm:px-6 lg:px-8 lg:py-28">
+        <div class="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-16 sm:gap-16 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
             <template v-if="features.length > 0">
                 <SectionHeading :eyebrow="t('Why choose us')" :title="t('Why :name', { name: company.name })" inverted />
                 <FeatureGrid :features="features" inverted />
             </template>
-            <StatisticsBand v-if="statistics.length > 0" :statistics="statistics" inverted :class="{ 'border-t border-white/10 pt-16': features.length > 0 }" />
+            <StatisticsBand v-if="statistics.length > 0" :statistics="statistics" inverted :class="{ 'border-t border-white/10 pt-10 sm:pt-16': features.length > 0 }" />
         </div>
     </section>
 

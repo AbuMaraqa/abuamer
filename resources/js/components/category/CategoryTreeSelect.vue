@@ -108,7 +108,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick, tru
                         v-model="term"
                         type="search"
                         :placeholder="t('Search categories…')"
-                        class="w-full rounded-lg bg-sand-100 py-2 ps-9 pe-3 text-sm focus:outline-none"
+                        class="w-full rounded-lg bg-sand-100 py-2 ps-9 pe-3 text-base placeholder:text-muted/80 focus:outline-none sm:text-sm"
                     />
                 </div>
             </div>

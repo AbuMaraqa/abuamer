@@ -125,18 +125,18 @@ const deleting = ref(null);
         </template>
     </PageHeader>
 
-    <section class="mb-5 grid gap-3 rounded-2xl border border-line bg-white p-4 md:grid-cols-2 xl:grid-cols-[1.4fr_1.4fr_1fr_1fr]">
-        <div class="relative">
+    <section class="mb-5 grid grid-cols-2 gap-3 rounded-2xl border border-line bg-white p-3 sm:p-4 xl:grid-cols-[1.4fr_1.4fr_1fr_1fr]">
+        <div class="relative col-span-2 md:col-span-1">
             <Icon name="search" :size="18" class="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-muted" />
             <input
                 v-model="filters.q"
                 type="search"
                 :placeholder="t('Search by name or code…')"
                 :aria-label="t('Search products')"
-                class="w-full rounded-lg border border-line py-2.5 ps-11 pe-3 text-sm placeholder:text-muted/80 focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20 focus:outline-none"
+                class="w-full rounded-lg border border-line py-2.5 ps-11 pe-3 text-base placeholder:text-muted/80 sm:text-sm focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20 focus:outline-none"
             />
         </div>
-        <div class="flex flex-col gap-2">
+        <div class="col-span-2 flex flex-col gap-2 md:col-span-1">
             <CategoryTreeSelect v-model="filters.category" :nodes="categories" allow-root :root-label="t('All categories')" />
             <label v-if="filters.category" class="flex items-center gap-2 text-xs text-ink-soft">
                 <input v-model="filters.descendants" type="checkbox" class="size-4 accent-brass-500" />
@@ -145,7 +145,7 @@ const deleting = ref(null);
         </div>
         <SelectInput v-model="filters.status" :options="statusOptions" :aria-label="t('Status')" />
         <SelectInput v-model="filters.featured" :options="featuredOptions" :aria-label="t('Featured')" />
-        <button v-if="hasFilters" type="button" class="justify-self-start text-sm text-brass-700 hover:underline" @click="clearFilters">{{ t('Clear filters') }}</button>
+        <button v-if="hasFilters" type="button" class="col-span-2 justify-self-start text-sm text-brass-700 hover:underline xl:col-span-1" @click="clearFilters">{{ t('Clear filters') }}</button>
     </section>
 
     <div v-if="selectedIds.length > 0" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl bg-ink px-4 py-3 text-sm text-white">

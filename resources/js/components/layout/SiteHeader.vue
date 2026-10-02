@@ -6,6 +6,7 @@ import { useFocusTrap } from '../../composables/useFocusTrap';
 import AppButton from '../common/AppButton.vue';
 import Icon from '../common/Icon.vue';
 import LanguageSwitcher from '../common/LanguageSwitcher.vue';
+import SocialIcon from '../common/SocialIcon.vue';
 import MegaMenu from './MegaMenu.vue';
 import MobileNavTree from './MobileNavTree.vue';
 import SiteLogo from './SiteLogo.vue';
@@ -103,7 +104,7 @@ onBeforeUnmount(() => {
         :class="isTransparent ? 'bg-transparent text-white' : 'border-b border-line bg-sand-50/90 text-ink backdrop-blur-md'"
         @mouseleave="closeMegaMenuSoon"
     >
-        <div class="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-20 lg:gap-6 lg:px-8">
             <SiteLogo :inverted="isTransparent" />
 
             <nav ref="desktopNav" class="hidden items-center gap-1 lg:flex" :aria-label="$t('Main navigation')" @focusout="onNavFocusOut">
@@ -144,10 +145,13 @@ onBeforeUnmount(() => {
                 <div class="hidden sm:block">
                     <LanguageSwitcher class="text-sm font-medium" />
                 </div>
-                <AppButton :href="route('contact')" :variant="isTransparent ? 'secondary' : 'primary'" class="hidden md:inline-flex">
-                    {{ $t('Request a quote') }}
-                </AppButton>
-                <button type="button" class="flex size-11 items-center justify-center lg:hidden" :aria-label="$t('Open menu')" :aria-expanded="isMobileMenuOpen" @click="isMobileMenuOpen = true">
+                <!-- A wrapper, not classes on AppButton: its own inline-flex would override "hidden". -->
+                <div class="hidden md:block">
+                    <AppButton :href="route('contact')" :variant="isTransparent ? 'secondary' : 'primary'">
+                        {{ $t('Request a quote') }}
+                    </AppButton>
+                </div>
+                <button type="button" class="-me-2.5 flex size-11 items-center justify-center lg:hidden" :aria-label="$t('Open menu')" :aria-expanded="isMobileMenuOpen" @click="isMobileMenuOpen = true">
                     <Icon name="menu" :size="24" />
                 </button>
             </div>
@@ -173,24 +177,58 @@ onBeforeUnmount(() => {
                 aria-modal="true"
                 :aria-label="$t('Main navigation')"
             >
-                <div class="flex h-20 items-center justify-between border-b border-line px-5">
-                    <SiteLogo />
-                    <button type="button" data-drawer-close class="flex size-11 items-center justify-center text-ink" :aria-label="$t('Close menu')" @click="isMobileMenuOpen = false">
+                <div class="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-line ps-5 pe-2.5">
+                    <SiteLogo size="sm" />
+                    <button type="button" data-drawer-close class="flex size-11 shrink-0 items-center justify-center text-ink" :aria-label="$t('Close menu')" @click="isMobileMenuOpen = false">
                         <Icon name="x" :size="22" />
                     </button>
                 </div>
 
-                <nav class="flex grow flex-col gap-1 overflow-y-auto px-5 py-6">
-                    <Link :href="route('home')" class="py-3 font-display text-2xl text-ink">{{ $t('Home') }}</Link>
-                    <Link :href="route('products.index')" class="py-3 font-display text-2xl text-ink">{{ $t('Products') }}</Link>
-                    <MobileNavTree :nodes="$page.props.site.navigation" class="mb-3" />
-                    <Link :href="route('about')" class="py-3 font-display text-2xl text-ink">{{ $t('About us') }}</Link>
-                    <Link :href="route('contact')" class="py-3 font-display text-2xl text-ink">{{ $t('Contact') }}</Link>
+                <nav class="flex grow flex-col overflow-y-auto px-5 py-2">
+                    <Link :href="links[0].href" class="drawer-link" :class="{ 'drawer-link-active': links[0].active }" :aria-current="links[0].active ? 'page' : undefined">
+                        {{ $t(links[0].label) }}
+                    </Link>
+                    <div class="border-b border-line pb-2">
+                        <Link :href="route('products.index')" class="drawer-link border-b-0" :class="{ 'drawer-link-active': isProductsActive }">{{ $t('Products') }}</Link>
+                        <MobileNavTree :nodes="$page.props.site.navigation" />
+                    </div>
+                    <Link
+                        v-for="link in links.slice(1)"
+                        :key="link.href"
+                        :href="link.href"
+                        class="drawer-link"
+                        :class="{ 'drawer-link-active': link.active }"
+                        :aria-current="link.active ? 'page' : undefined"
+                    >
+                        {{ $t(link.label) }}
+                    </Link>
                 </nav>
 
-                <div class="flex items-center justify-between gap-4 border-t border-line px-5 py-5">
-                    <LanguageSwitcher class="text-sm font-medium text-ink" />
-                    <AppButton :href="route('contact')" size="sm">{{ $t('Request a quote') }}</AppButton>
+                <div class="flex shrink-0 flex-col gap-4 border-t border-line bg-white px-5 py-5">
+                    <AppButton :href="route('contact')" size="lg" class="w-full">{{ $t('Request a quote') }}</AppButton>
+                    <div class="flex items-center justify-between gap-4">
+                        <LanguageSwitcher class="text-sm font-medium text-ink" />
+                        <div class="flex items-center gap-2">
+                            <a
+                                v-if="$page.props.site.contact.phone"
+                                :href="`tel:${$page.props.site.contact.phone}`"
+                                class="flex size-11 items-center justify-center rounded-full border border-line text-ink-soft transition-colors hover:border-ink hover:text-ink"
+                                :aria-label="$t('Call us')"
+                            >
+                                <Icon name="phone" :size="18" />
+                            </a>
+                            <a
+                                v-if="$page.props.site.contact.whatsapp"
+                                :href="`https://wa.me/${$page.props.site.contact.whatsapp}`"
+                                target="_blank"
+                                rel="noopener"
+                                class="flex size-11 items-center justify-center rounded-full bg-[#25D366] text-white transition-opacity hover:opacity-90"
+                                :aria-label="$t('Chat with us on WhatsApp')"
+                            >
+                                <SocialIcon network="whatsapp" :size="20" />
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </aside>
         </Transition>

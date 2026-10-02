@@ -50,15 +50,15 @@ function submit() {
 </script>
 
 <template>
-    <section class="mx-auto max-w-7xl px-4 pt-16 pb-12 sm:px-6 lg:px-8 lg:pt-20">
+    <section class="mx-auto max-w-7xl px-4 pt-10 pb-8 sm:px-6 sm:pt-16 sm:pb-12 lg:px-8 lg:pt-20">
         <p class="eyebrow">{{ t('Contact') }}</p>
-        <h1 class="mt-4 max-w-3xl font-display text-5xl leading-tight text-ink sm:text-6xl">{{ t('Let’s talk about your project') }}</h1>
-        <p class="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
+        <h1 class="mt-4 max-w-3xl font-display text-4xl leading-tight text-balance text-ink sm:text-6xl">{{ t('Let’s talk about your project') }}</h1>
+        <p class="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:mt-5 sm:text-lg">
             {{ t('Our team will help you choose the right tiles, sizes and finishes for your space.') }}
         </p>
     </section>
 
-    <section class="mx-auto grid max-w-7xl gap-10 px-4 pb-24 sm:px-6 lg:grid-cols-5 lg:gap-14 lg:px-8">
+    <section class="mx-auto grid max-w-7xl gap-8 px-4 pb-16 sm:gap-10 sm:px-6 sm:pb-24 lg:grid-cols-5 lg:gap-14 lg:px-8">
         <div class="flex flex-col gap-8 lg:col-span-2">
             <ul class="flex flex-col divide-y divide-line border-y border-line">
                 <li v-for="channel in channels" :key="channel.label" class="flex gap-4 py-5">
@@ -110,7 +110,7 @@ function submit() {
             </div>
         </div>
 
-        <form ref="formElement" class="flex flex-col gap-5 rounded-2xl border border-line bg-white p-6 sm:p-8 lg:col-span-3" novalidate @submit.prevent="submit">
+        <form ref="formElement" class="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 sm:p-8 lg:col-span-3" novalidate @submit.prevent="submit">
             <h2 class="font-display text-2xl text-ink">{{ t('Send us a message') }}</h2>
 
             <div class="grid gap-5 sm:grid-cols-2">
@@ -138,7 +138,7 @@ function submit() {
                 <input id="contact-website" v-model="form.website" type="text" tabindex="-1" autocomplete="off" />
             </div>
 
-            <AppButton type="submit" size="lg" class="self-start" :loading="form.processing">{{ t('Send message') }}</AppButton>
+            <AppButton type="submit" size="lg" class="w-full sm:w-auto sm:self-start" :loading="form.processing">{{ t('Send message') }}</AppButton>
         </form>
     </section>
 
@@ -146,7 +146,7 @@ function submit() {
         <iframe
             :src="mapEmbedUrl"
             :title="t('Our location on the map')"
-            class="h-[28rem] w-full grayscale-[35%]"
+            class="h-80 w-full grayscale-[35%] sm:h-[28rem]"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
             allowfullscreen

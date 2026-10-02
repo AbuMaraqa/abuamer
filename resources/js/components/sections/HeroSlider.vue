@@ -218,8 +218,12 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Controls -->
+        <!-- Below the desktop width the row keeps clear of the floating WhatsApp button in its end corner. -->
         <div v-if="count > 1" class="absolute inset-x-0 bottom-0 z-20">
-            <div class="mx-auto flex max-w-7xl items-center gap-4 px-4 pb-8 sm:gap-6 sm:px-6 lg:px-8 lg:pb-10">
+            <div
+                class="mx-auto flex max-w-7xl items-center gap-4 px-4 pb-8 sm:gap-6 sm:px-6 lg:px-8 lg:pb-10"
+                :class="{ 'max-sm:pe-20 sm:max-lg:pe-24': $page.props.site.contact.whatsapp }"
+            >
                 <p class="shrink-0 font-display text-lg tabular-nums lining-nums" dir="ltr" aria-live="polite">
                     <span class="text-white">{{ pad(current + 1) }}</span>
                     <span class="text-white/40"> / {{ pad(count) }}</span>
@@ -251,9 +255,10 @@ onBeforeUnmount(() => {
                     >
                         <Icon :name="isPausedByUser ? 'play' : 'pause'" :size="16" />
                     </button>
+                    <!-- Phones swipe or tap the progress bars instead of these arrows. -->
                     <button
                         type="button"
-                        class="flex size-11 items-center justify-center rounded-full border border-white/30 transition-colors hover:border-white hover:bg-white hover:text-ink sm:size-12"
+                        class="hidden size-12 items-center justify-center rounded-full border border-white/30 transition-colors hover:border-white hover:bg-white hover:text-ink sm:flex"
                         :aria-label="t('Previous slide')"
                         @click="previous"
                     >
@@ -261,7 +266,7 @@ onBeforeUnmount(() => {
                     </button>
                     <button
                         type="button"
-                        class="flex size-11 items-center justify-center rounded-full border border-white/30 transition-colors hover:border-white hover:bg-white hover:text-ink sm:size-12"
+                        class="hidden size-12 items-center justify-center rounded-full border border-white/30 transition-colors hover:border-white hover:bg-white hover:text-ink sm:flex"
                         :aria-label="t('Next slide')"
                         @click="next"
                     >

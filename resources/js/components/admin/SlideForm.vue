@@ -84,7 +84,7 @@ function submit() {
 </script>
 
 <template>
-    <form class="grid gap-6 xl:grid-cols-[1fr_24rem]" @submit.prevent="submit">
+    <form class="form-with-actions grid gap-6 xl:grid-cols-[1fr_24rem]" @submit.prevent="submit">
         <div class="flex min-w-0 flex-col gap-6">
             <section class="rounded-2xl border border-line bg-white p-5 sm:p-6">
                 <h2 class="mb-5 text-base font-semibold text-ink">{{ t('Content') }}</h2>
@@ -175,7 +175,7 @@ function submit() {
                 <ToggleSwitch v-model="form.status" :label="t('Visible on website')" />
             </section>
 
-            <div class="flex gap-3 xl:sticky xl:top-24">
+            <div class="form-actions xl:sticky xl:top-24">
                 <AppButton type="submit" size="lg" class="grow" :loading="form.processing">
                     {{ slide ? t('Save changes') : t('Add slide') }}
                 </AppButton>

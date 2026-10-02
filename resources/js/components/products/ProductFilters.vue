@@ -49,7 +49,7 @@ onBeforeUnmount(() => clearTimeout(timer));
             :placeholder="$t('Search by name or code…')"
             :aria-label="$t('Search products')"
             :aria-busy="isSearching"
-            class="w-full rounded-full border border-line bg-white py-3 ps-11 pe-4 text-sm placeholder:text-muted/80 focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20 focus:outline-none"
+            class="w-full rounded-full border border-line bg-white py-3 ps-11 pe-4 text-base placeholder:text-muted/80 sm:text-sm focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20 focus:outline-none"
         />
     </div>
 </template>

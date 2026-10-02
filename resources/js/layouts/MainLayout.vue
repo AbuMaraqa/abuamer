@@ -13,6 +13,11 @@ const page = usePage();
  * The home page hero runs underneath the transparent header; other pages start below it.
  */
 const startsBelowHeader = computed(() => page.component !== 'Home');
+
+/**
+ * On phones the product page has its own inquiry bar with a WhatsApp button.
+ */
+const hasInquiryBar = computed(() => page.component === 'Catalog/Product');
 </script>
 
 <template>
@@ -25,13 +30,15 @@ const startsBelowHeader = computed(() => page.component !== 'Home');
 
         <SiteHeader />
 
-        <main id="content" class="grow" :class="{ 'pt-20': startsBelowHeader }">
+        <main id="content" class="grow" :class="{ 'pt-16 lg:pt-20': startsBelowHeader }">
             <slot />
         </main>
 
         <SiteFooter />
 
-        <WhatsAppButton v-if="$page.props.site.contact.whatsapp" :number="$page.props.site.contact.whatsapp" />
+        <div v-if="$page.props.site.contact.whatsapp" :class="{ 'max-lg:hidden': hasInquiryBar }">
+            <WhatsAppButton :number="$page.props.site.contact.whatsapp" />
+        </div>
         <FlashToaster />
     </div>
 </template>

@@ -249,8 +249,9 @@ function submit() {
             </div>
         </section>
 
-        <div class="flex justify-end">
-            <AppButton type="submit" size="lg" :loading="form.processing">{{ t('Save changes') }}</AppButton>
+        <!-- Stays in reach while scrolling the long tabs, like the company page. -->
+        <div class="sticky bottom-4 z-10 flex justify-end">
+            <AppButton type="submit" size="lg" class="shadow-xl shadow-ink/10" :loading="form.processing">{{ t('Save changes') }}</AppButton>
         </div>
     </form>
 </template>

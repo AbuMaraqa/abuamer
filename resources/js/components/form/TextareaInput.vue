@@ -12,7 +12,7 @@ const model = defineModel({ type: [String, null], default: '' });
     <textarea
         v-model="model"
         v-bind="$attrs"
-        class="w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm leading-relaxed text-ink placeholder:text-muted/80 transition-colors focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20 focus:outline-none"
+        class="w-full rounded-lg border bg-white px-3.5 py-2.5 text-base leading-relaxed text-ink sm:text-sm placeholder:text-muted/80 transition-colors focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20 focus:outline-none"
         :class="invalid ? 'border-danger/60' : 'border-line'"
         :aria-invalid="invalid || undefined"
     />

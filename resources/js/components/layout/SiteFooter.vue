@@ -10,8 +10,9 @@ const year = new Date().getFullYear();
 
 <template>
     <footer class="bg-ink text-sand-300">
-        <div class="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] lg:px-8 lg:py-20">
-            <div class="flex flex-col gap-5">
+        <!-- On phones the two link lists sit side by side; the brand and contact blocks take the full width. -->
+        <div class="mx-auto grid max-w-7xl grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 sm:px-6 md:gap-12 md:py-16 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] lg:px-8 lg:py-20">
+            <div class="col-span-2 flex flex-col gap-5 lg:col-span-1">
                 <SiteLogo inverted />
                 <p v-if="$page.props.site.tagline" class="max-w-xs text-sm leading-relaxed text-sand-400">{{ $page.props.site.tagline }}</p>
                 <div v-if="Object.keys($page.props.site.social).length > 0" class="flex flex-wrap gap-2">
@@ -21,7 +22,7 @@ const year = new Date().getFullYear();
                         :href="url"
                         target="_blank"
                         rel="noopener"
-                        class="flex size-10 items-center justify-center rounded-full border border-white/15 text-sand-300 transition-colors hover:border-white hover:text-white"
+                        class="flex size-11 items-center justify-center rounded-full border border-white/15 text-sand-300 transition-colors hover:border-white hover:text-white"
                         :aria-label="network"
                     >
                         <SocialIcon :network="network" :size="16" />
@@ -30,25 +31,25 @@ const year = new Date().getFullYear();
             </div>
 
             <nav :aria-label="$t('Collections')">
-                <h2 class="mb-5 text-sm font-semibold text-white">{{ $t('Collections') }}</h2>
-                <ul class="flex flex-col gap-3 text-sm">
+                <h2 class="mb-4 text-sm font-semibold text-white sm:mb-5">{{ $t('Collections') }}</h2>
+                <ul class="flex flex-col gap-1.5 text-sm sm:gap-2">
                     <li v-for="collection in $page.props.site.navigation.slice(0, 6)" :key="collection.id">
-                        <Link :href="collection.url" class="transition-colors hover:text-white">{{ collection.name }}</Link>
+                        <Link :href="collection.url" class="inline-block py-1 transition-colors hover:text-white">{{ collection.name }}</Link>
                     </li>
                 </ul>
             </nav>
 
             <nav :aria-label="$t('Company')">
-                <h2 class="mb-5 text-sm font-semibold text-white">{{ $t('Company') }}</h2>
-                <ul class="flex flex-col gap-3 text-sm">
-                    <li><Link :href="route('about')" class="transition-colors hover:text-white">{{ $t('About us') }}</Link></li>
-                    <li><Link :href="route('products.index')" class="transition-colors hover:text-white">{{ $t('Products') }}</Link></li>
-                    <li><Link :href="route('contact')" class="transition-colors hover:text-white">{{ $t('Contact') }}</Link></li>
+                <h2 class="mb-4 text-sm font-semibold text-white sm:mb-5">{{ $t('Company') }}</h2>
+                <ul class="flex flex-col gap-1.5 text-sm sm:gap-2">
+                    <li><Link :href="route('about')" class="inline-block py-1 transition-colors hover:text-white">{{ $t('About us') }}</Link></li>
+                    <li><Link :href="route('products.index')" class="inline-block py-1 transition-colors hover:text-white">{{ $t('Products') }}</Link></li>
+                    <li><Link :href="route('contact')" class="inline-block py-1 transition-colors hover:text-white">{{ $t('Contact') }}</Link></li>
                 </ul>
             </nav>
 
-            <div>
-                <h2 class="mb-5 text-sm font-semibold text-white">{{ $t('Contact') }}</h2>
+            <div class="col-span-2 lg:col-span-1">
+                <h2 class="mb-4 text-sm font-semibold text-white sm:mb-5">{{ $t('Contact') }}</h2>
                 <ul class="flex flex-col gap-3.5 text-sm">
                     <li v-if="$page.props.site.contact.address" class="flex gap-3">
                         <Icon name="map-pin" :size="18" class="mt-0.5 shrink-0 text-brass-400" />

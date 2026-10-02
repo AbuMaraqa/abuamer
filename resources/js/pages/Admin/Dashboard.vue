@@ -35,21 +35,22 @@ const shortcuts = computed(() =>
 
     <PageHeader :title="t('Welcome, :name', { name: $page.props.auth.user.name })" :eyebrow="t('Control panel')" />
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <!-- Two compact tiles per row on phones (icon above the figure); a row of four on wide screens. -->
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <component
             :is="card.href ? Link : 'div'"
             v-for="card in cards"
             :key="card.label"
             :href="card.href ?? undefined"
-            class="flex items-center justify-between gap-4 rounded-2xl border border-line bg-white p-6 transition-colors"
+            class="flex flex-col-reverse items-start gap-3 rounded-2xl border border-line bg-white p-4 transition-colors sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-6"
             :class="{ 'hover:border-sand-400': card.href }"
         >
-            <div>
-                <p class="text-sm text-muted">{{ card.label }}</p>
-                <p class="mt-2 font-display text-4xl text-ink tabular-nums lining-nums">{{ card.value }}</p>
+            <div class="min-w-0">
+                <p class="text-sm leading-snug text-muted">{{ card.label }}</p>
+                <p class="mt-1 font-display text-3xl text-ink tabular-nums lining-nums sm:mt-2 sm:text-4xl">{{ card.value }}</p>
             </div>
-            <span class="flex size-12 items-center justify-center rounded-full bg-sand-100 text-brass-700">
-                <Icon :name="card.icon" :size="22" />
+            <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-sand-100 text-brass-700 sm:size-12">
+                <Icon :name="card.icon" :size="20" />
             </span>
         </component>
     </div>

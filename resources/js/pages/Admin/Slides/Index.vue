@@ -56,20 +56,21 @@ function destroy() {
     </PageHeader>
 
     <VueDraggable v-if="items.length > 0" v-model="items" handle=".slide-handle" :animation="180" tag="ol" class="flex flex-col gap-3" @end="saveOrder">
-        <li v-for="(slide, index) in items" :key="slide.id" class="flex items-center gap-3 rounded-2xl border border-line bg-white p-3 sm:gap-4">
-            <button type="button" class="slide-handle flex size-9 shrink-0 cursor-grab items-center justify-center text-sand-400 hover:text-ink" :aria-label="t('Drag to reorder')">
+        <!-- On phones the actions wrap onto their own line, so the title is not squeezed. -->
+        <li v-for="(slide, index) in items" :key="slide.id" class="flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-white p-3 sm:flex-nowrap sm:gap-4">
+            <button type="button" class="slide-handle -ms-1 flex size-9 shrink-0 cursor-grab items-center justify-center text-sand-400 hover:text-ink" :aria-label="t('Drag to reorder')">
                 <Icon name="grip-vertical" :size="18" />
             </button>
 
-            <div class="relative aspect-video w-28 shrink-0 overflow-hidden rounded-lg bg-sand-100 sm:w-44">
+            <div class="relative aspect-video w-24 shrink-0 overflow-hidden rounded-lg bg-sand-100 sm:w-44">
                 <img v-if="slide.image" :src="slide.image.thumb" alt="" class="h-full w-full object-cover" :class="{ 'opacity-40 grayscale': !slide.status }" />
                 <ImagePlaceholder v-else />
                 <span class="absolute start-1.5 top-1.5 rounded bg-ink/70 px-1.5 py-0.5 text-[10px] text-white tabular-nums" dir="ltr">{{ String(index + 1).padStart(2, '0') }}</span>
             </div>
 
-            <div class="min-w-0 grow">
+            <div class="min-w-0 flex-1">
                 <p v-if="slide.eyebrow" class="truncate text-xs text-brass-600">{{ slide.eyebrow }}</p>
-                <Link :href="route('admin.slides.edit', slide.id)" class="block truncate font-medium text-ink hover:text-brass-700">{{ slide.title }}</Link>
+                <Link :href="route('admin.slides.edit', slide.id)" class="line-clamp-2 font-medium text-ink hover:text-brass-700 sm:line-clamp-none sm:truncate">{{ slide.title }}</Link>
                 <p class="mt-1 flex items-center gap-1.5 truncate text-xs text-muted">
                     <template v-if="slide.button">
                         <Icon name="arrow-right" :size="12" />
@@ -79,26 +80,25 @@ function destroy() {
                 </p>
             </div>
 
-            <button
-                type="button"
-                class="hidden shrink-0 rounded-full px-3 py-1 text-xs sm:inline-flex"
-                :class="slide.status ? 'bg-success/10 text-success' : 'bg-sand-200 text-muted'"
-                :title="slide.status ? t('Hide from website') : t('Show on website')"
-                @click="toggleStatus(slide)"
-            >
-                {{ slide.status ? t('Visible') : t('Hidden') }}
-            </button>
+            <div class="flex w-full shrink-0 items-center justify-between gap-2 border-t border-line pt-3 sm:w-auto sm:justify-end sm:border-0 sm:pt-0">
+                <button
+                    type="button"
+                    class="shrink-0 rounded-full px-3 py-1.5 text-xs sm:py-1"
+                    :class="slide.status ? 'bg-success/10 text-success' : 'bg-sand-200 text-muted'"
+                    :title="slide.status ? t('Hide from website') : t('Show on website')"
+                    @click="toggleStatus(slide)"
+                >
+                    {{ slide.status ? t('Visible') : t('Hidden') }}
+                </button>
 
-            <div class="flex shrink-0 items-center">
-                <button type="button" class="flex size-9 items-center justify-center rounded-lg text-muted hover:bg-sand-100 hover:text-ink sm:hidden" :aria-label="slide.status ? t('Hide from website') : t('Show on website')" @click="toggleStatus(slide)">
-                    <Icon :name="slide.status ? 'eye' : 'eye-off'" :size="16" />
-                </button>
-                <Link :href="route('admin.slides.edit', slide.id)" class="flex size-9 items-center justify-center rounded-lg text-muted hover:bg-sand-100 hover:text-ink" :aria-label="t('Edit :name', { name: slide.title })">
-                    <Icon name="edit" :size="16" />
-                </Link>
-                <button type="button" class="flex size-9 items-center justify-center rounded-lg text-muted hover:bg-danger/5 hover:text-danger" :aria-label="t('Delete :name', { name: slide.title })" @click="deleting = slide">
-                    <Icon name="trash" :size="16" />
-                </button>
+                <div class="flex items-center">
+                    <Link :href="route('admin.slides.edit', slide.id)" class="flex size-10 items-center justify-center rounded-lg text-muted hover:bg-sand-100 hover:text-ink sm:size-9" :aria-label="t('Edit :name', { name: slide.title })">
+                        <Icon name="edit" :size="16" />
+                    </Link>
+                    <button type="button" class="flex size-10 items-center justify-center rounded-lg text-muted hover:bg-danger/5 hover:text-danger sm:size-9" :aria-label="t('Delete :name', { name: slide.title })" @click="deleting = slide">
+                        <Icon name="trash" :size="16" />
+                    </button>
+                </div>
             </div>
         </li>
     </VueDraggable>
