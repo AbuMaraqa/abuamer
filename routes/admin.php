@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\CategoryMoveController;
 use App\Http\Controllers\Admin\CategoryReorderController;
 use App\Http\Controllers\Admin\CategoryStatusController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ProductCategoryController;
+use App\Http\Controllers\Admin\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,3 +26,6 @@ Route::patch('categories/reorder', CategoryReorderController::class)->name('cate
 Route::patch('categories/{category}/move', CategoryMoveController::class)->name('categories.move');
 Route::patch('categories/{category}/status', CategoryStatusController::class)->name('categories.status');
 Route::resource('categories', CategoryController::class)->except('show');
+
+Route::patch('products/category', ProductCategoryController::class)->name('products.category');
+Route::resource('products', ProductController::class)->except('show');
