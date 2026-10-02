@@ -221,7 +221,7 @@ onBeforeUnmount(() => {
         <!-- Below the desktop width the row keeps clear of the floating WhatsApp button in its end corner. -->
         <div v-if="count > 1" class="absolute inset-x-0 bottom-0 z-20">
             <div
-                class="mx-auto flex max-w-7xl items-center gap-4 px-4 pb-8 sm:gap-6 sm:px-6 lg:px-8 lg:pb-10"
+                class="mx-auto flex max-w-7xl items-center gap-3 px-4 pb-8 sm:gap-6 sm:px-6 lg:px-8 lg:pb-10"
                 :class="{ 'max-sm:pe-20 sm:max-lg:pe-24': $page.props.site.contact.whatsapp }"
             >
                 <p class="shrink-0 font-display text-lg tabular-nums lining-nums" dir="ltr" aria-live="polite">
@@ -246,10 +246,11 @@ onBeforeUnmount(() => {
                     </button>
                 </div>
 
-                <div class="flex shrink-0 items-center gap-2">
+                <!-- On phones only the pause button remains here; it moves beside the counter so it is not left on its own. -->
+                <div class="flex shrink-0 items-center gap-2 max-sm:order-first">
                     <button
                         type="button"
-                        class="flex size-11 items-center justify-center rounded-full text-white/80 transition-colors hover:text-white"
+                        class="flex size-11 items-center justify-center rounded-full text-white/80 transition-colors hover:text-white max-sm:border max-sm:border-white/30 max-sm:text-white"
                         :aria-label="isPausedByUser ? t('Play slideshow') : t('Pause slideshow')"
                         @click="isPausedByUser = !isPausedByUser"
                     >
