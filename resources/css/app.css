@@ -65,4 +65,22 @@
     .eyebrow {
         @apply text-xs font-medium text-brass-600 ltr:tracking-[0.2em] ltr:uppercase;
     }
+
+    /* Category tree drag & drop (SortableJS classes). */
+    .category-ghost > div {
+        @apply rounded-lg border border-dashed border-brass-400 bg-brass-300/15;
+    }
+
+    .category-ghost > div > * {
+        @apply opacity-40;
+    }
+
+    .category-chosen > div {
+        @apply bg-white shadow-lg shadow-ink/10;
+    }
+
+    /* While dragging, an opened leaf exposes an empty list as a drop zone. */
+    .is-dragging .category-list-empty {
+        @apply my-1 min-h-10 rounded-lg border border-dashed border-sand-300 bg-sand-50;
+    }
 }

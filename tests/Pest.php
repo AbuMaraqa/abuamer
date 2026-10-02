@@ -1,5 +1,10 @@
 <?php
 
+use App\Enums\Permission;
+use App\Enums\Role;
+use App\Models\Category;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,7 +49,43 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Create a category tree from nested English names, preserving the given order.
+ * Example: ['Tiles' => ['Floor Tiles' => ['Indoor' => []]], 'Porcelain' => []].
+ *
+ * @param  array<string, array<string, mixed>>  $structure
+ * @return array<string, Category> Every created category keyed by its English name.
+ */
+function createCategoryTree(array $structure, ?Category $parent = null): array
 {
-    // ..
+    $created = [];
+    $position = 0;
+
+    foreach ($structure as $name => $children) {
+        $category = Category::factory()->named($name)->create([
+            'parent_id' => $parent?->id,
+            'sort_order' => ++$position,
+        ]);
+
+        $created[$name] = $category;
+        $created += createCategoryTree($children, $category);
+    }
+
+    return $created;
+}
+
+function admin(): User
+{
+    test()->seed(RolesAndPermissionsSeeder::class);
+
+    return User::factory()->create()->assignRole(Role::Admin);
+}
+
+function userWithPermissions(Permission ...$permissions): User
+{
+    test()->seed(RolesAndPermissionsSeeder::class);
+
+    return User::factory()->create()->givePermissionTo(
+        array_map(fn (Permission $permission): string => $permission->value, $permissions),
+    );
 }

@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CategoryMoveController;
+use App\Http\Controllers\Admin\CategoryReorderController;
+use App\Http\Controllers\Admin\CategoryStatusController;
 use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,3 +18,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', DashboardController::class)->name('dashboard');
+
+// Registered before the resource so "reorder" is not captured as a {category} binding.
+Route::patch('categories/reorder', CategoryReorderController::class)->name('categories.reorder');
+Route::patch('categories/{category}/move', CategoryMoveController::class)->name('categories.move');
+Route::patch('categories/{category}/status', CategoryStatusController::class)->name('categories.status');
+Route::resource('categories', CategoryController::class)->except('show');

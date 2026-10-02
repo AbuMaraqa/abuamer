@@ -12,7 +12,7 @@ const props = defineProps({
 
 const variants = {
     primary: 'bg-ink text-white hover:bg-ink-soft',
-    accent: 'bg-brass-500 text-white hover:bg-brass-600',
+    accent: 'bg-brass-600 text-white hover:bg-brass-700',
     secondary: 'border border-line bg-white text-ink hover:border-sand-400',
     danger: 'bg-danger text-white hover:bg-danger/90',
     ghost: 'text-ink-soft hover:bg-sand-200',

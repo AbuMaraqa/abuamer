@@ -21,5 +21,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Nasaq Admin',
             'email' => 'admin@nasaq.test',
         ])->assignRole(Role::Admin);
+
+        $this->call(CatalogSeeder::class);
     }
 }

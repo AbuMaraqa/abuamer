@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
@@ -29,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::preventLazyLoading(! $this->app->isProduction());
         Model::preventSilentlyDiscardingAttributes($this->app->isLocal());
+
+        // Single resources and plain collections are sent as-is; paginated collections keep data/links/meta.
+        JsonResource::withoutWrapping();
 
         // Localized routes are registered per locale, so they must be cached with
         // `php artisan route:trans:cache` instead of `php artisan route:cache`.
