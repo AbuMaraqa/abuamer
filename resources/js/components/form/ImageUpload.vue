@@ -10,6 +10,9 @@ const props = defineProps({
     current: { type: Object, default: null },
     error: { type: String, default: null },
     hint: { type: String, default: null },
+    // Show the whole image (logos, icons) instead of cropping it to fill the frame.
+    contain: { type: Boolean, default: false },
+    accept: { type: String, default: 'image/jpeg,image/png,image/webp' },
 });
 
 const file = defineModel({ type: [File, null], default: null });
@@ -19,7 +22,7 @@ const inputId = useId();
 const previewUrl = ref(null);
 const isDragging = ref(false);
 
-const shownImage = computed(() => previewUrl.value ?? (removed.value ? null : (props.current?.thumb ?? null)));
+const shownImage = computed(() => previewUrl.value ?? (removed.value ? null : (props.contain ? props.current?.url : props.current?.thumb) ?? null));
 
 function setFile(selected) {
     if (!selected || !selected.type.startsWith('image/')) {
@@ -56,7 +59,7 @@ onBeforeUnmount(() => previewUrl.value && URL.revokeObjectURL(previewUrl.value))
 <template>
     <div class="flex flex-col gap-2">
         <div v-if="shownImage" class="group relative overflow-hidden rounded-xl border border-line bg-sand-100">
-            <img :src="shownImage" alt="" class="aspect-[4/3] w-full object-cover" />
+            <img :src="shownImage" alt="" class="aspect-[4/3] w-full" :class="contain ? 'object-contain p-6' : 'object-cover'" />
             <div class="absolute inset-x-0 bottom-0 flex justify-end gap-2 bg-gradient-to-t from-ink/60 to-transparent p-3">
                 <label :for="inputId" class="cursor-pointer rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-ink hover:bg-white">
                     {{ $t('Replace') }}
@@ -78,10 +81,10 @@ onBeforeUnmount(() => previewUrl.value && URL.revokeObjectURL(previewUrl.value))
         >
             <Icon name="upload" :size="28" class="text-sand-400" />
             <span class="text-sm text-ink-soft">{{ $t('Drop an image here or click to choose') }}</span>
-            <span class="text-xs text-muted">JPG, PNG, WebP</span>
+            <span class="text-xs text-muted">{{ accept === 'image/png' ? 'PNG' : accept.includes('jpeg') ? 'JPG, PNG, WebP' : 'PNG, WebP' }}</span>
         </label>
 
-        <input :id="inputId" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only" @change="setFile($event.target.files[0]); $event.target.value = ''" />
+        <input :id="inputId" type="file" :accept="accept" class="sr-only" @change="setFile($event.target.files[0]); $event.target.value = ''" />
 
         <p v-if="error" class="text-sm text-danger" role="alert">{{ error }}</p>
         <p v-else-if="hint" class="text-xs text-muted">{{ hint }}</p>

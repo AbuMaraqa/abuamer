@@ -2,6 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\HighlightType;
+use App\Http\Resources\CategoryResource;
+use App\Http\Resources\CompanyHighlightResource;
+use App\Http\Resources\CompanyResource;
+use App\Http\Resources\ProductResource;
+use App\Models\Company;
+use App\Models\CompanyHighlight;
+use App\Models\Product;
+use App\Services\Catalog\CategoryTreeService;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -10,8 +19,26 @@ class HomeController extends Controller
     /**
      * Show the home page.
      */
-    public function __invoke(): Response
+    public function __invoke(CategoryTreeService $categoryTree): Response
     {
-        return Inertia::render('Home');
+        $tree = $categoryTree->tree();
+        $highlights = CompanyHighlight::query()->with('translations')->ordered()->get();
+
+        $featuredProducts = Product::query()
+            ->active()
+            ->featured()
+            ->inCategories($tree->visibleIds())
+            ->with(['translations', 'media'])
+            ->ordered()
+            ->limit(8)
+            ->get();
+
+        return Inertia::render('Home', [
+            'company' => CompanyResource::make(Company::current()),
+            'collections' => CategoryResource::collection($tree->collections()->load('media')),
+            'featuredProducts' => ProductResource::collection($featuredProducts),
+            'features' => CompanyHighlightResource::collection($highlights->where('type', HighlightType::Feature)->values()),
+            'statistics' => CompanyHighlightResource::collection($highlights->where('type', HighlightType::Statistic)->values()),
+        ]);
     }
 }

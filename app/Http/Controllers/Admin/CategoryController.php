@@ -10,6 +10,7 @@ use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTreeService;
+use App\Support\MediaSync;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -65,9 +66,7 @@ class CategoryController extends Controller
             ...$request->translations(),
         ]);
 
-        if ($request->hasFile('image')) {
-            $category->addMediaFromRequest('image')->toMediaCollection(Category::IMAGE_COLLECTION);
-        }
+        MediaSync::single($category, Category::IMAGE_COLLECTION, $request->file('image'));
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Category ":name" created.', ['name' => $category->name])]);
 
@@ -101,11 +100,7 @@ class CategoryController extends Controller
             }
         });
 
-        if ($request->hasFile('image')) {
-            $category->addMediaFromRequest('image')->toMediaCollection(Category::IMAGE_COLLECTION);
-        } elseif ($request->boolean('remove_image')) {
-            $category->clearMediaCollection(Category::IMAGE_COLLECTION);
-        }
+        MediaSync::single($category, Category::IMAGE_COLLECTION, $request->file('image'), $request->boolean('remove_image'));
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Category ":name" updated.', ['name' => $category->name])]);
 

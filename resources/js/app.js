@@ -7,11 +7,15 @@ import MainLayout from './layouts/MainLayout.vue';
 
 createInertiaApp({
     title: (title) => {
-        const appName = usePage().props.appName;
+        const siteName = usePage().props.site?.name ?? usePage().props.appName;
 
-        return title && title !== appName ? `${title} | ${appName}` : appName;
+        return title && title !== siteName ? `${title} | ${siteName}` : siteName;
     },
     layout: (name) => {
+        if (name === 'Maintenance' || name === 'Error') {
+            return null;
+        }
+
         if (name.startsWith('Admin/')) {
             return AdminLayout;
         }

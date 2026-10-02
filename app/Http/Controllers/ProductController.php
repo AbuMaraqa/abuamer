@@ -43,7 +43,7 @@ class ProductController extends Controller
             ->withQueryString();
 
         return Inertia::render('Catalog/Index', [
-            'categories' => CategoryResource::collection($tree->roots()->filter->status->values()->load('media')),
+            'categories' => CategoryResource::collection($tree->collections()->load('media')),
             'products' => ProductResource::collection($products),
             'filters' => [
                 'q' => $request->string('q')->trim()->value(),

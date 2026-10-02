@@ -29,7 +29,7 @@ onBeforeUnmount(removeListener);
 </script>
 
 <template>
-    <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col items-center gap-2 sm:inset-x-auto sm:end-6 sm:items-end">
+    <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col items-center gap-2 sm:inset-x-auto sm:start-6 sm:items-start">
         <TransitionGroup
             enter-active-class="transition duration-300 ease-elegant"
             enter-from-class="translate-y-2 opacity-0"

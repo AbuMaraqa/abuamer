@@ -17,7 +17,7 @@ const navigation = [
     { label: 'Categories', icon: 'folder-tree', routeName: 'admin.categories.index', active: 'admin.categories.*', permission: 'categories.view' },
     { label: 'Products', icon: 'box', routeName: 'admin.products.index', active: 'admin.products.*', permission: 'products.view' },
     { label: 'Company', icon: 'building', routeName: 'admin.company.edit', active: 'admin.company.*', permission: 'company.manage' },
-    { label: 'Messages', icon: 'mail', routeName: 'admin.messages.index', active: 'admin.messages.*', permission: 'settings.manage' },
+    { label: 'Messages', icon: 'mail', routeName: 'admin.messages.index', active: 'admin.messages.*', permission: 'messages.manage', badge: 'unreadMessages' },
     { label: 'Settings', icon: 'settings', routeName: 'admin.settings.edit', active: 'admin.settings.*', permission: 'settings.manage' },
 ];
 
@@ -61,6 +61,9 @@ onBeforeUnmount(removeNavigateListener);
                 >
                     <Icon :name="item.icon" :size="18" />
                     {{ $t(item.label) }}
+                    <span v-if="item.badge && $page.props[item.badge] > 0" class="ms-auto rounded-full bg-brass-500 px-2 py-0.5 text-[11px] font-semibold text-white tabular-nums">
+                        {{ $page.props[item.badge] }}
+                    </span>
                 </Link>
             </nav>
 

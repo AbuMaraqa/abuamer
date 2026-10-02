@@ -7,7 +7,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 describe('index', function () {
     it('lists active products from visible categories only', function () {
-        $categories = createCategoryTree(['Porcelain' => [], 'Hidden' => []]);
+        $categories = createCategoryTree(['Porcelain' => [], 'Wall Tiles' => [], 'Hidden' => []]);
         $categories['Hidden']->update(['status' => false]);
         $visible = Product::factory()->for($categories['Porcelain'])->create();
         Product::factory()->for($categories['Porcelain'])->inactive()->create();
@@ -19,7 +19,16 @@ describe('index', function () {
             ->component('Catalog/Index')
             ->has('products.data', 1)
             ->where('products.data.0.id', $visible->id)
-            ->has('categories', 1));
+            ->where('categories', fn ($categories) => collect($categories)->pluck('name')->all() === ['Porcelain', 'Wall Tiles']));
+    });
+
+    it('presents the children of a single root category as the collections', function () {
+        createCategoryTree(['Tiles' => ['Porcelain' => [], 'Wall Tiles' => []]]);
+
+        $response = $this->get(route('products.index'));
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('categories', fn ($categories) => collect($categories)->pluck('name')->all() === ['Porcelain', 'Wall Tiles']));
     });
 
     it('paginates the products', function () {

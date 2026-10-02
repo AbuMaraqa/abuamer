@@ -3,7 +3,14 @@
 namespace App\Http\Middleware;
 
 use App\Enums\Permission;
+use App\Http\Resources\CategoryResource;
+use App\Models\Company;
+use App\Models\ContactMessage;
 use App\Models\User;
+use App\Services\Catalog\CategoryTreeService;
+use App\Settings\ContactSettings;
+use App\Settings\SocialSettings;
+use App\Support\Localized;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Middleware;
@@ -57,9 +64,45 @@ class HandleInertiaRequests extends Middleware
             ],
             'localeUrls' => fn (): array => $this->localeUrls(),
             'translations' => Inertia::once(fn (): array => $this->translations()),
+            'site' => Inertia::once(fn (): array => $this->site()),
             'auth' => [
                 'user' => fn (): ?array => $this->authenticatedUser($request->user()),
             ],
+            'unreadMessages' => fn (): ?int => $request->routeIs('admin.*') && $request->user()?->can(Permission::MessagesManage->value)
+                ? ContactMessage::query()->unread()->count()
+                : null,
+        ];
+    }
+
+    /**
+     * Company identity, contact details and navigation used by the layouts.
+     *
+     * @return array<string, mixed>
+     */
+    private function site(): array
+    {
+        $company = Company::current();
+        $contact = app(ContactSettings::class);
+        $tree = app(CategoryTreeService::class)->tree();
+
+        return [
+            'name' => $company->name ?: config('app.name'),
+            'tagline' => $company->tagline,
+            'logo' => $company->getFirstMediaUrl(Company::LOGO_COLLECTION) ?: null,
+            'favicon' => $company->getFirstMediaUrl(Company::FAVICON_COLLECTION) ?: null,
+            'contact' => [
+                'phone' => $contact->phone ?: null,
+                'mobile' => $contact->mobile ?: null,
+                'whatsapp' => $contact->whatsapp ?: null,
+                'email' => $contact->email ?: null,
+                'address' => Localized::value($contact->address) ?: null,
+                'map_url' => $contact->map_url ?: null,
+            ],
+            'social' => app(SocialSettings::class)->links(),
+            // Two levels for the mega menu; deeper categories are reached from category pages.
+            'navigation' => CategoryResource::collection(
+                $tree->nested($tree->collectionsParentId(), activeOnly: true, maxDepth: 2),
+            )->resolve(),
         ];
     }
 

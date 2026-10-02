@@ -264,7 +264,7 @@ final class CategoryTree
      *
      * @return Collection<int, Category>
      */
-    public function nested(?int $parentId = null, bool $activeOnly = false): Collection
+    public function nested(?int $parentId = null, bool $activeOnly = false, ?int $maxDepth = null): Collection
     {
         $nodes = [];
 
@@ -276,11 +276,36 @@ final class CategoryTree
             }
 
             $node = clone $category;
-            $node->setRelation('children', $this->nested($id, $activeOnly));
+            $node->setRelation('children', $maxDepth === 1
+                ? new Collection
+                : $this->nested($id, $activeOnly, $maxDepth === null ? null : $maxDepth - 1));
             $nodes[] = $node;
         }
 
         return new Collection($nodes);
+    }
+
+    /**
+     * The category whose visible children are presented as the main collections: none (the
+     * roots themselves) unless the website has a single visible root such as "Tiles".
+     */
+    public function collectionsParentId(): ?int
+    {
+        $visibleRoots = $this->roots()->filter(fn (Category $root): bool => $root->status);
+
+        return $visibleRoots->count() === 1 ? $visibleRoots->first()->id : null;
+    }
+
+    /**
+     * The visible main collections (see collectionsParentId()).
+     *
+     * @return Collection<int, Category>
+     */
+    public function collections(): Collection
+    {
+        return $this->children($this->collectionsParentId())
+            ->filter(fn (Category $category): bool => $category->status)
+            ->values();
     }
 
     /**

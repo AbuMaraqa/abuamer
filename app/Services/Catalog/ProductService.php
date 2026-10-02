@@ -3,9 +3,9 @@
 namespace App\Services\Catalog;
 
 use App\Models\Product;
+use App\Support\MediaSync;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Persists the complete state submitted by the product form: attributes and
@@ -34,8 +34,8 @@ class ProductService
             $this->syncSpecifications($product, $specifications);
         });
 
-        $this->syncMainImage($product, $mainImage, $removeMainImage);
-        $this->syncGallery($product, $keptGalleryIds, $galleryUploads);
+        MediaSync::single($product, Product::MAIN_IMAGE_COLLECTION, $mainImage, $removeMainImage);
+        MediaSync::gallery($product, Product::GALLERY_COLLECTION, $keptGalleryIds, $galleryUploads);
 
         return $product;
     }
@@ -60,35 +60,5 @@ class ProductService
 
         $product->specifications()->whereKeyNot($keptIds)->delete();
         $product->unsetRelation('specifications');
-    }
-
-    private function syncMainImage(Product $product, ?UploadedFile $mainImage, bool $removeMainImage): void
-    {
-        if ($mainImage !== null) {
-            $product->addMedia($mainImage)->toMediaCollection(Product::MAIN_IMAGE_COLLECTION);
-        } elseif ($removeMainImage) {
-            $product->clearMediaCollection(Product::MAIN_IMAGE_COLLECTION);
-        }
-    }
-
-    /**
-     * @param  list<int>  $keptIds
-     * @param  list<UploadedFile>  $uploads
-     */
-    private function syncGallery(Product $product, array $keptIds, array $uploads): void
-    {
-        $gallery = $product->getMedia(Product::GALLERY_COLLECTION);
-
-        // Only ids that already belong to this product's gallery are honoured.
-        $keptIds = array_values(array_intersect($keptIds, $gallery->pluck('id')->all()));
-
-        $gallery->whereNotIn('id', $keptIds)->each(fn (Media $media) => $media->delete());
-
-        foreach ($uploads as $upload) {
-            $keptIds[] = $product->addMedia($upload)->toMediaCollection(Product::GALLERY_COLLECTION)->id;
-        }
-
-        Media::setNewOrder($keptIds);
-        $product->unsetRelation('media');
     }
 }

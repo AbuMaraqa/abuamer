@@ -4,9 +4,12 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CategoryMoveController;
 use App\Http\Controllers\Admin\CategoryReorderController;
 use App\Http\Controllers\Admin\CategoryStatusController;
+use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,3 +32,11 @@ Route::resource('categories', CategoryController::class)->except('show');
 
 Route::patch('products/category', ProductCategoryController::class)->name('products.category');
 Route::resource('products', ProductController::class)->except('show');
+
+Route::get('company', [CompanyController::class, 'edit'])->name('company.edit');
+Route::put('company', [CompanyController::class, 'update'])->name('company.update');
+
+Route::resource('messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
+
+Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
+Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
