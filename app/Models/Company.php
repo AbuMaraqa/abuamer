@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Services\CompanyProfile;
 use App\Support\ImageTransparency;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Image\Enums\Fit;
@@ -19,7 +19,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[Fillable(['founded_year'])]
 class Company extends Model implements HasMedia, TranslatableContract
 {
-    use InteractsWithMedia, Translatable;
+    use HasTranslations, InteractsWithMedia;
 
     public const string LOGO_COLLECTION = 'logo';
 

@@ -8,6 +8,7 @@ import Icon from '../../../components/common/Icon.vue';
 import SocialIcon from '../../../components/common/SocialIcon.vue';
 import FormField from '../../../components/form/FormField.vue';
 import ImageUpload from '../../../components/form/ImageUpload.vue';
+import LocaleHeading from '../../../components/form/LocaleHeading.vue';
 import SelectInput from '../../../components/form/SelectInput.vue';
 import TextareaInput from '../../../components/form/TextareaInput.vue';
 import TextInput from '../../../components/form/TextInput.vue';
@@ -150,8 +151,8 @@ function submit() {
             </div>
 
             <div class="grid gap-5 md:grid-cols-2">
-                <div v-for="locale in locales" :key="locale.code" :dir="locale.code === 'ar' ? 'rtl' : 'ltr'" :lang="locale.code" class="flex flex-col gap-4">
-                    <p class="text-xs font-semibold text-brass-600">{{ locale.native }}</p>
+                <div v-for="locale in locales" :key="locale.code" :dir="locale.direction" :lang="locale.code" class="flex flex-col gap-4">
+                    <LocaleHeading :locale="locale" />
                     <FormField :label="t('Address')" :for="`address-${locale.code}`" :error="form.errors[`contact.address.${locale.code}`]">
                         <TextareaInput :id="`address-${locale.code}`" v-model="form.contact.address[locale.code]" rows="2" />
                     </FormField>
@@ -186,8 +187,8 @@ function submit() {
         <section v-show="activeTab === 'seo'" class="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 sm:p-6">
             <p class="text-sm text-muted">{{ t('Used for the home page and for any page without its own search engine texts.') }}</p>
             <div class="grid gap-6 md:grid-cols-2">
-                <div v-for="locale in locales" :key="locale.code" :dir="locale.code === 'ar' ? 'rtl' : 'ltr'" :lang="locale.code" class="flex flex-col gap-4">
-                    <p class="text-xs font-semibold text-brass-600">{{ locale.native }}</p>
+                <div v-for="locale in locales" :key="locale.code" :dir="locale.direction" :lang="locale.code" class="flex flex-col gap-4">
+                    <LocaleHeading :locale="locale" />
                     <FormField :label="t('SEO title')" :for="`meta-title-${locale.code}`" :error="form.errors[`seo.meta_title.${locale.code}`]">
                         <TextInput :id="`meta-title-${locale.code}`" v-model="form.seo.meta_title[locale.code]" />
                     </FormField>

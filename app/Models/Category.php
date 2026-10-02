@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Services\Catalog\CategoryTree;
 use App\Services\Catalog\CategoryTreeService;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
 use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -30,7 +30,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class Category extends Model implements HasMedia, TranslatableContract
 {
     /** @use HasFactory<CategoryFactory> */
-    use HasFactory, InteractsWithMedia, Translatable;
+    use HasFactory, HasTranslations, InteractsWithMedia;
 
     public const string IMAGE_COLLECTION = 'category_image';
 

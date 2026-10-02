@@ -50,6 +50,28 @@ it('links to the same category in the other language', function () {
         ->where('localeUrls.ar', route('products.category', ['path' => 'بورسلان/تأثير-الرخام'])));
 });
 
+it('resolves Hebrew slug paths with the English slug of a category that has no Hebrew name', function () {
+    $this->useRoutingLocale('he');
+    $porcelain = Category::factory()->named('Porcelain', 'بورسلان')->withHebrew('פורצלן')->create();
+    $marble = Category::factory()->named('Marble Effect', 'تأثير الرخام')->childOf($porcelain)->create();
+
+    $response = $this->get(route('products.category', ['path' => 'פורצלן/marble-effect']));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('category.id', $marble->id)
+        ->where('category.name', 'Marble Effect'));
+});
+
+it('links to the Hebrew page with the slugs its categories are shown with', function () {
+    $porcelain = Category::factory()->named('Porcelain', 'بورسلان')->withHebrew('פורצלן')->create();
+    Category::factory()->named('Marble Effect', 'تأثير الرخام')->childOf($porcelain)->create();
+
+    $response = $this->get(route('products.category', ['path' => 'بورسلان/تأثير-الرخام']));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('localeUrls.he', url('he/products/'.rawurlencode('פורצלן').'/marble-effect')));
+});
+
 it('returns 404 when the path segments are not nested', function () {
     createCategoryTree(['Porcelain' => [], 'Marble Effect' => []]);
 

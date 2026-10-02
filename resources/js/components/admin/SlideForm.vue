@@ -6,6 +6,7 @@ import { useTranslations } from '../../composables/useTranslations';
 import CategoryTreeSelect from '../category/CategoryTreeSelect.vue';
 import AppButton from '../common/AppButton.vue';
 import FormField from '../form/FormField.vue';
+import LocaleHeading from '../form/LocaleHeading.vue';
 import ImageUpload from '../form/ImageUpload.vue';
 import TextareaInput from '../form/TextareaInput.vue';
 import TextInput from '../form/TextInput.vue';
@@ -89,22 +90,22 @@ function submit() {
                 <h2 class="mb-5 text-base font-semibold text-ink">{{ t('Content') }}</h2>
 
                 <div class="grid gap-6 md:grid-cols-2">
-                    <div v-for="locale in locales" :key="locale.code" :dir="locale.code === 'ar' ? 'rtl' : 'ltr'" :lang="locale.code" class="flex flex-col gap-4">
-                        <p class="text-xs font-semibold text-brass-600">{{ locale.native }}</p>
+                    <div v-for="locale in locales" :key="locale.code" :dir="locale.direction" :lang="locale.code" class="flex flex-col gap-4">
+                        <LocaleHeading :locale="locale" />
 
                         <FormField :label="t('Small heading')" :for="`eyebrow-${locale.code}`" :error="form.errors[`${locale.code}.eyebrow`]" :hint="t('Optional, e.g. “New collection”.')">
                             <TextInput :id="`eyebrow-${locale.code}`" v-model="form[locale.code].eyebrow" maxlength="80" />
                         </FormField>
 
-                        <FormField :label="t('Title')" :for="`title-${locale.code}`" :error="form.errors[`${locale.code}.title`]" required>
-                            <TextInput :id="`title-${locale.code}`" v-model="form[locale.code].title" maxlength="120" required :invalid="!!form.errors[`${locale.code}.title`]" />
+                        <FormField :label="t('Title')" :for="`title-${locale.code}`" :error="form.errors[`${locale.code}.title`]" :required="locale.required">
+                            <TextInput :id="`title-${locale.code}`" v-model="form[locale.code].title" maxlength="120" :required="locale.required" :invalid="!!form.errors[`${locale.code}.title`]" />
                         </FormField>
 
                         <FormField :label="t('Text')" :for="`text-${locale.code}`" :error="form.errors[`${locale.code}.text`]">
                             <TextareaInput :id="`text-${locale.code}`" v-model="form[locale.code].text" rows="3" maxlength="300" />
                         </FormField>
 
-                        <FormField v-if="form.link_type !== 'none'" :label="t('Button text')" :for="`button-${locale.code}`" :error="form.errors[`${locale.code}.button_label`]" required>
+                        <FormField v-if="form.link_type !== 'none'" :label="t('Button text')" :for="`button-${locale.code}`" :error="form.errors[`${locale.code}.button_label`]" :required="locale.required">
                             <TextInput :id="`button-${locale.code}`" v-model="form[locale.code].button_label" maxlength="40" :invalid="!!form.errors[`${locale.code}.button_label`]" />
                         </FormField>
 
@@ -114,7 +115,7 @@ function submit() {
                             :for="`url-${locale.code}`"
                             :error="form.errors[`${locale.code}.button_url`]"
                             :hint="t('https://… or a page of this website such as /:locale/about', { locale: locale.code })"
-                            required
+                            :required="locale.required"
                         >
                             <TextInput :id="`url-${locale.code}`" v-model="form[locale.code].button_url" dir="ltr" :invalid="!!form.errors[`${locale.code}.button_url`]" />
                         </FormField>

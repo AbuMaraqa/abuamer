@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\HighlightType;
+use App\Models\Concerns\HasTranslations;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
 use Database\Factories\CompanyHighlightFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 class CompanyHighlight extends Model implements TranslatableContract
 {
     /** @use HasFactory<CompanyHighlightFactory> */
-    use HasFactory, Translatable;
+    use HasFactory, HasTranslations;
 
     /**
      * Icons available for "why choose us" features (rendered by the Vue Icon component).

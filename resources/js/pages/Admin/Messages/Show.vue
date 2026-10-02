@@ -34,7 +34,7 @@ function destroy() {
     <div class="grid gap-6 lg:grid-cols-[1fr_18rem]">
         <article class="rounded-2xl border border-line bg-white p-6 sm:p-8">
             <p class="text-xs text-muted">{{ receivedAt }}</p>
-            <p class="mt-5 text-base leading-loose whitespace-pre-line text-ink" :dir="message.locale === 'ar' ? 'rtl' : 'ltr'">{{ message.message }}</p>
+            <p class="mt-5 text-base leading-loose whitespace-pre-line text-ink" dir="auto">{{ message.message }}</p>
         </article>
 
         <aside class="flex flex-col gap-4 rounded-2xl border border-line bg-white p-6 text-sm">

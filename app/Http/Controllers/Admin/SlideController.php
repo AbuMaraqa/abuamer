@@ -66,7 +66,7 @@ class SlideController extends Controller
 
     public function update(UpdateSlideRequest $request, Slide $slide): RedirectResponse
     {
-        $slide->update($request->slideAttributes());
+        $slide->fillWithTranslations($request->slideAttributes())->save();
 
         MediaSync::single($slide, Slide::IMAGE_COLLECTION, $request->file('image'));
         MediaSync::single($slide, Slide::MOBILE_IMAGE_COLLECTION, $request->file('mobile_image'), $request->boolean('remove_mobile_image'));

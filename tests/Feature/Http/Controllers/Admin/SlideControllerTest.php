@@ -71,6 +71,21 @@ it('requires a category and a button text when linking to a category', function 
     $response->assertSessionHasErrors(['category_id', 'ar.button_label', 'en.button_label']);
 });
 
+it('requires the Hebrew button text only when the slide has a Hebrew title', function (string $hebrewTitle, bool $isRequired) {
+    $response = $this->actingAs(admin())->post(route('admin.slides.store'), slidePayload([
+        'link_type' => 'category',
+        'category_id' => Category::factory()->create()->id,
+        'ar' => ['button_label' => 'اكتشف'],
+        'en' => ['button_label' => 'Discover'],
+        'he' => ['title' => $hebrewTitle, 'button_label' => ''],
+    ]));
+
+    $isRequired ? $response->assertSessionHasErrors('he.button_label') : $response->assertSessionHasNoErrors();
+})->with([
+    'Hebrew title' => ['שיש קלקטה', true],
+    'no Hebrew' => ['', false],
+]);
+
 it('refuses custom links that are not https or a path of this website', function (string $url) {
     $response = $this->actingAs(admin())->post(route('admin.slides.store'), slidePayload([
         'link_type' => 'custom',

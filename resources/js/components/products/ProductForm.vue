@@ -8,6 +8,7 @@ import CategoryTreeSelect from '../category/CategoryTreeSelect.vue';
 import AppButton from '../common/AppButton.vue';
 import Icon from '../common/Icon.vue';
 import FormField from '../form/FormField.vue';
+import LocaleHeading from '../form/LocaleHeading.vue';
 import ImageUpload from '../form/ImageUpload.vue';
 import TextareaInput from '../form/TextareaInput.vue';
 import TextInput from '../form/TextInput.vue';
@@ -53,7 +54,7 @@ function updateName(locale, name) {
     form[locale].name = name;
 
     if (!slugTouched[locale]) {
-        form[locale].slug = slugify(name, locale);
+        form[locale].slug = slugify(name, locales.find(({ code }) => code === locale));
     }
 }
 
@@ -92,15 +93,15 @@ function submit() {
                 <h2 class="mb-5 text-base font-semibold text-ink">{{ t('Content') }}</h2>
 
                 <div class="grid gap-6 md:grid-cols-2">
-                    <div v-for="locale in locales" :key="locale.code" :dir="locale.code === 'ar' ? 'rtl' : 'ltr'" :lang="locale.code" class="flex flex-col gap-4">
-                        <p class="text-xs font-semibold text-brass-600">{{ locale.native }}</p>
+                    <div v-for="locale in locales" :key="locale.code" :dir="locale.direction" :lang="locale.code" class="flex flex-col gap-4">
+                        <LocaleHeading :locale="locale" />
 
-                        <FormField :label="t('Name')" :for="`name-${locale.code}`" :error="form.errors[`${locale.code}.name`]" required>
+                        <FormField :label="t('Name')" :for="`name-${locale.code}`" :error="form.errors[`${locale.code}.name`]" :required="locale.required">
                             <TextInput
                                 :id="`name-${locale.code}`"
                                 :model-value="form[locale.code].name"
                                 :invalid="!!form.errors[`${locale.code}.name`]"
-                                required
+                                :required="locale.required"
                                 @update:model-value="updateName(locale.code, $event)"
                             />
                         </FormField>
@@ -155,7 +156,7 @@ function submit() {
                 </summary>
 
                 <div class="mt-5 grid gap-6 md:grid-cols-2">
-                    <div v-for="locale in locales" :key="locale.code" :dir="locale.code === 'ar' ? 'rtl' : 'ltr'" :lang="locale.code" class="flex flex-col gap-4">
+                    <div v-for="locale in locales" :key="locale.code" :dir="locale.direction" :lang="locale.code" class="flex flex-col gap-4">
                         <p class="text-xs font-semibold text-brass-600">{{ locale.native }}</p>
                         <FormField :label="t('SEO title')" :for="`seo-title-${locale.code}`" :error="form.errors[`${locale.code}.seo_title`]">
                             <TextInput :id="`seo-title-${locale.code}`" v-model="form[locale.code].seo_title" maxlength="255" />

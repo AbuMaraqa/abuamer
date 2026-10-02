@@ -17,6 +17,17 @@ it('lists every visible page in both languages with their alternates', function 
         ->assertSee('hreflang="ar" href="'.url('ar/product/'.rawurlencode('كالاكاتا-ذهبي')).'"', escape: false);
 });
 
+it('lists the Hebrew pages with the slugs they are shown with', function () {
+    $porcelain = Category::factory()->named('Porcelain', 'بورسلان')->withHebrew('פורצלן')->create();
+    Product::factory()->for($porcelain)->named('Calacatta Gold', 'كالاكاتا ذهبي')->create();
+
+    $response = $this->get(route('sitemap'));
+
+    $response->assertSee('<loc>'.url('he/products/'.rawurlencode('פורצלן')).'</loc>', escape: false)
+        ->assertSee('<loc>'.url('he/product/calacatta-gold').'</loc>', escape: false)
+        ->assertSee('hreflang="he" href="'.url('he/about').'"', escape: false);
+});
+
 it('leaves hidden categories and inactive products out of the sitemap', function () {
     $hidden = Category::factory()->named('Hidden Collection')->inactive()->create();
     Product::factory()->for($hidden)->named('Hidden Product')->create();

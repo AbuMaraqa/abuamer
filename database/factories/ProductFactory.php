@@ -54,6 +54,16 @@ class ProductFactory extends Factory
         ]);
     }
 
+    /**
+     * Add a Hebrew translation with the given name, e.g. withHebrew('קלקטה זהב').
+     */
+    public function withHebrew(string $hebrewName): static
+    {
+        return $this->state(fn () => [
+            'he' => ['name' => $hebrewName, 'slug' => Slug::make($hebrewName, 'he'), 'short_description' => 'תיאור קצר של '.$hebrewName],
+        ]);
+    }
+
     public function inactive(): static
     {
         return $this->state(fn () => ['status' => false]);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\Concerns\ValidatesTranslations;
 use App\Models\Category;
 use App\Services\Catalog\CategoryTreeService;
 use App\Support\Slug;
@@ -12,6 +13,8 @@ use Illuminate\Validation\Validator;
 
 class StoreCategoryRequest extends FormRequest
 {
+    use ValidatesTranslations;
+
     /**
      * Translated fields accepted for every locale.
      */
@@ -60,9 +63,9 @@ class StoreCategoryRequest extends FormRequest
         ];
 
         foreach ($this->locales() as $locale) {
-            $rules[$locale] = ['required', 'array'];
-            $rules["{$locale}.name"] = ['required', 'string', 'max:255'];
-            $rules["{$locale}.slug"] = ['required', 'string', 'max:255', 'regex:'.Slug::PATTERN];
+            $rules[$locale] = $this->languageRules($locale);
+            $rules["{$locale}.name"] = [...$this->requiredInLanguage($locale, $locale, ['slug', 'description', 'seo_title', 'seo_description']), 'string', 'max:255'];
+            $rules["{$locale}.slug"] = [...$this->requiredInLanguage($locale, $locale, ['name']), 'string', 'max:255', 'regex:'.Slug::PATTERN];
             $rules["{$locale}.description"] = ['nullable', 'string', 'max:5000'];
             $rules["{$locale}.seo_title"] = ['nullable', 'string', 'max:255'];
             $rules["{$locale}.seo_description"] = ['nullable', 'string', 'max:500'];
@@ -102,6 +105,14 @@ class StoreCategoryRequest extends FormRequest
     /**
      * @return array<string, string>
      */
+    public function messages(): array
+    {
+        return $this->translationMessages();
+    }
+
+    /**
+     * @return array<string, string>
+     */
     public function attributes(): array
     {
         $attributes = [];
@@ -125,19 +136,20 @@ class StoreCategoryRequest extends FormRequest
     }
 
     /**
-     * Translated attributes keyed by locale, ready for the Translatable model.
+     * Translated attributes keyed by locale, ready for the Translatable model. Optional
+     * languages left empty are omitted.
      *
      * @return array<string, array<string, string|null>>
      */
     public function translations(): array
     {
-        return collect($this->locales())
+        return $this->withoutEmptyLanguages(collect($this->locales())
             ->mapWithKeys(fn (string $locale): array => [
                 $locale => collect(self::TRANSLATED_FIELDS)
                     ->mapWithKeys(fn (string $field): array => [$field => $this->validated("{$locale}.{$field}")])
                     ->all(),
             ])
-            ->all();
+            ->all());
     }
 
     /**
@@ -146,13 +158,5 @@ class StoreCategoryRequest extends FormRequest
     protected function ignoredCategoryId(): ?int
     {
         return null;
-    }
-
-    /**
-     * @return list<string>
-     */
-    protected function locales(): array
-    {
-        return config('translatable.locales');
     }
 }

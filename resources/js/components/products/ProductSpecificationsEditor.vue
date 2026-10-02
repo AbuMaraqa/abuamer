@@ -22,19 +22,23 @@ let nextKey = 0;
  * Common tile attributes offered as one-click starting points.
  */
 const presets = [
-    { en: 'Size', ar: 'المقاس' },
-    { en: 'Thickness', ar: 'السماكة' },
-    { en: 'Finish', ar: 'التشطيب' },
-    { en: 'Material', ar: 'المادة' },
-    { en: 'Usage', ar: 'الاستخدام' },
-    { en: 'Color', ar: 'اللون' },
+    { en: 'Size', ar: 'المقاس', he: 'מידה' },
+    { en: 'Thickness', ar: 'السماكة', he: 'עובי' },
+    { en: 'Finish', ar: 'التشطيب', he: 'גימור' },
+    { en: 'Material', ar: 'المادة', he: 'חומר' },
+    { en: 'Usage', ar: 'الاستخدام', he: 'שימוש' },
+    { en: 'Color', ar: 'اللون', he: 'צבע' },
 ];
 
+/**
+ * Presets fill the names in the required languages only: a name in an optional language
+ * would make its value required as well.
+ */
 function add(preset = null) {
     rows.value.push({
         key: `new-${++nextKey}`,
         id: null,
-        ...Object.fromEntries(locales.map(({ code }) => [code, { label: preset?.[code] ?? '', value: '' }])),
+        ...Object.fromEntries(locales.map(({ code, required }) => [code, { label: (required && preset?.[code]) || '', value: '' }])),
     });
 }
 
@@ -56,7 +60,7 @@ function errorFor(index, locale, field) {
                 </button>
 
                 <div class="grid min-w-0 grow gap-3 md:grid-cols-2">
-                    <div v-for="locale in locales" :key="locale.code" :dir="locale.code === 'ar' ? 'rtl' : 'ltr'" :lang="locale.code" class="grid grid-cols-[2fr_3fr] gap-2">
+                    <div v-for="locale in locales" :key="locale.code" :dir="locale.direction" :lang="locale.code" class="grid grid-cols-[2fr_3fr] gap-2">
                         <div>
                             <TextInput
                                 v-model="row[locale.code].label"
@@ -97,7 +101,7 @@ function errorFor(index, locale, field) {
                 class="rounded-full bg-sand-100 px-3 py-1 text-xs text-ink-soft hover:bg-sand-200"
                 @click="add(preset)"
             >
-                {{ preset[$page.props.locale.current] }}
+                {{ preset[$page.props.locale.current] ?? preset.en }}
             </button>
         </div>
     </div>

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -21,7 +21,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class Product extends Model implements HasMedia, TranslatableContract
 {
     /** @use HasFactory<ProductFactory> */
-    use HasFactory, InteractsWithMedia, Translatable;
+    use HasFactory, HasTranslations, InteractsWithMedia;
 
     public const string MAIN_IMAGE_COLLECTION = 'product_main_image';
 

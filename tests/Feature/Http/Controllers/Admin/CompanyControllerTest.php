@@ -69,6 +69,29 @@ it('syncs each list of highlights in its submitted order', function () {
     $this->assertModelMissing($removed);
 });
 
+it('saves Hebrew texts and only the highlights written in Hebrew', function () {
+    $response = $this->actingAs(admin())->put(route('admin.company.update'), companyPayload([
+        'he' => ['name' => 'נסק אריחים וקרמיקה'],
+        'values' => [
+            ['id' => null, 'ar' => ['title' => 'الجودة'], 'en' => ['title' => 'Quality'], 'he' => ['title' => 'איכות']],
+            ['id' => null, 'ar' => ['title' => 'الابتكار'], 'en' => ['title' => 'Innovation'], 'he' => ['title' => '', 'description' => '']],
+        ],
+    ]));
+
+    $response->assertSessionHasNoErrors();
+    $values = CompanyHighlight::query()->with('translations')->ordered()->get();
+    expect(Company::current()->translate('he')->name)->toBe('נסק אריחים וקרמיקה')
+        ->and($values->map(fn (CompanyHighlight $value) => $value->translate('he')?->title)->all())->toBe(['איכות', null]);
+});
+
+it('requires the Hebrew company name once another Hebrew text is filled', function () {
+    $response = $this->actingAs(admin())->put(route('admin.company.update'), companyPayload([
+        'he' => ['name' => '', 'tagline' => 'אריחי יוקרה'],
+    ]));
+
+    $response->assertSessionHasErrors('he.name');
+});
+
 it('does not turn a highlight of another list into a value', function () {
     $statistic = CompanyHighlight::factory()->statistic()->create();
 

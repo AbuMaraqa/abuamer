@@ -4,13 +4,13 @@
  */
 
 /**
- * Normalise text for matching: case-insensitive, without diacritics, and with
- * Arabic letter variants unified (أ إ آ → ا, ى → ي, ة → ه).
+ * Normalise text for matching: case-insensitive, without diacritics (including Hebrew
+ * niqqud), and with Arabic letter variants unified (أ إ آ → ا, ى → ي, ة → ه).
  */
 export function normalizeSearchText(value) {
     return String(value ?? '')
         .normalize('NFKD')
-        .replace(/[̀-ًͯ-ٰٟـ]/g, '')
+        .replace(/[\u0300-\u036f\u064b-\u065f\u0670\u0640\u0591-\u05c7]/g, '')
         .replace(/[أإآ]/g, 'ا')
         .replace(/ى/g, 'ي')
         .replace(/ة/g, 'ه')
@@ -104,21 +104,24 @@ export function flattenTree(nodes, depth = 0) {
 }
 
 /**
- * Turn a name into a URL slug in its own script (Arabic letters are kept).
+ * Turn a name into a URL slug in its own script (Arabic and Hebrew letters are kept).
  * The server normalises slugs the same way; this only previews them while typing.
+ *
+ * @param {{ script: string }} locale One of the shared `locale.supported` entries.
  */
 export function slugify(value, locale) {
     let text = String(value ?? '')
         .trim()
         .replaceAll('×', 'x');
 
-    if (locale !== 'ar') {
-        text = text.normalize('NFKD').replace(/[̀-ͯ]/g, '');
+    if (locale.script === 'Latn') {
+        text = text.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
     }
 
+    // Arabic harakat and Hebrew niqqud are not letters, so they are dropped as on the server.
     return text
         .toLowerCase()
-        .replace(/[ً-ٰٟ]/g, '')
+        .replace(/[\u064b-\u065f\u0670\u0591-\u05c7]/g, '')
         .replace(/[_\s]+/g, '-')
         .replace(/[^\p{L}\p{N}-]+/gu, '')
         .replace(/-{2,}/g, '-')

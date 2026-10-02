@@ -52,6 +52,16 @@ class CategoryFactory extends Factory
         ]);
     }
 
+    /**
+     * Add a Hebrew translation with the given name, e.g. withHebrew('פורצלן').
+     */
+    public function withHebrew(string $hebrewName): static
+    {
+        return $this->state(fn () => [
+            'he' => ['name' => $hebrewName, 'slug' => Slug::make($hebrewName, 'he'), 'description' => 'תיאור '.$hebrewName],
+        ]);
+    }
+
     public function childOf(Category $parent): static
     {
         return $this->state(fn () => ['parent_id' => $parent->id]);

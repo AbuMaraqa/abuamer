@@ -8,6 +8,7 @@ return [
     'supportedLocales' => [
         'ar' => ['name' => 'Arabic', 'script' => 'Arab', 'native' => 'العربية', 'regional' => 'ar_AE'],
         'en' => ['name' => 'English', 'script' => 'Latn', 'native' => 'English', 'regional' => 'en_GB'],
+        'he' => ['name' => 'Hebrew', 'script' => 'Hebr', 'native' => 'עברית', 'regional' => 'he_IL'],
     ],
 
     // Visitors always land on the default (Arabic) locale instead of being
@@ -18,7 +19,7 @@ return [
     // default locale has a single canonical URL as well.
     'hideDefaultLocaleInURL' => false,
 
-    'localesOrder' => ['ar', 'en'],
+    'localesOrder' => ['ar', 'en', 'he'],
 
     'localesMapping' => [],
 

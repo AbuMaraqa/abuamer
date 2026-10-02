@@ -8,6 +8,7 @@ import AppButton from '../../../components/common/AppButton.vue';
 import Icon from '../../../components/common/Icon.vue';
 import FormField from '../../../components/form/FormField.vue';
 import ImageUpload from '../../../components/form/ImageUpload.vue';
+import LocaleHeading from '../../../components/form/LocaleHeading.vue';
 import TextareaInput from '../../../components/form/TextareaInput.vue';
 import TextInput from '../../../components/form/TextInput.vue';
 import GalleryManager from '../../../components/products/GalleryManager.vue';
@@ -126,15 +127,15 @@ function submit() {
         <!-- Texts of the identity, home and about tabs -->
         <section v-for="group in ['identity', 'home', 'about']" v-show="activeTab === group" :key="group" class="grid gap-6 lg:grid-cols-[1fr_20rem]">
             <div class="grid gap-6 rounded-2xl border border-line bg-white p-5 sm:p-6 md:grid-cols-2">
-                <div v-for="locale in locales" :key="locale.code" :dir="locale.code === 'ar' ? 'rtl' : 'ltr'" :lang="locale.code" class="flex flex-col gap-4">
-                    <p class="text-xs font-semibold text-brass-600">{{ locale.native }}</p>
+                <div v-for="locale in locales" :key="locale.code" :dir="locale.direction" :lang="locale.code" class="flex flex-col gap-4">
+                    <LocaleHeading :locale="locale" />
                     <FormField
                         v-for="field in textFields[group]"
                         :key="field.name"
                         :label="t(field.label)"
                         :for="`${field.name}-${locale.code}`"
                         :error="form.errors[`${locale.code}.${field.name}`]"
-                        :required="field.required"
+                        :required="field.required && locale.required"
                     >
                         <TextareaInput v-if="field.multiline" :id="`${field.name}-${locale.code}`" v-model="form[locale.code][field.name]" :rows="field.rows ?? 3" />
                         <TextInput v-else :id="`${field.name}-${locale.code}`" v-model="form[locale.code][field.name]" :invalid="!!form.errors[`${locale.code}.${field.name}`]" />

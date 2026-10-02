@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\Concerns\ValidatesTranslations;
 use App\Models\Product;
+use App\Support\Locales;
 use App\Support\Slug;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -15,6 +17,8 @@ use Illuminate\Validation\Rule;
  */
 class StoreProductRequest extends FormRequest
 {
+    use ValidatesTranslations;
+
     private const array TRANSLATED_FIELDS = ['name', 'slug', 'short_description', 'description', 'seo_title', 'seo_description'];
 
     private const array IMAGE_RULES = ['image', 'mimes:jpg,jpeg,png,webp', 'max:8192', 'dimensions:min_width=600,min_height=600'];
@@ -77,10 +81,14 @@ class StoreProductRequest extends FormRequest
         ];
 
         foreach ($this->locales() as $locale) {
-            $rules[$locale] = ['required', 'array'];
-            $rules["{$locale}.name"] = ['required', 'string', 'max:255'];
+            $rules[$locale] = $this->languageRules($locale);
+            $rules["{$locale}.name"] = [
+                ...$this->requiredInLanguage($locale, $locale, ['slug', 'short_description', 'description', 'seo_title', 'seo_description']),
+                'string',
+                'max:255',
+            ];
             $rules["{$locale}.slug"] = [
-                'required',
+                ...$this->requiredInLanguage($locale, $locale, ['name']),
                 'string',
                 'max:255',
                 'regex:'.Slug::PATTERN,
@@ -90,11 +98,19 @@ class StoreProductRequest extends FormRequest
             $rules["{$locale}.description"] = ['nullable', 'string', 'max:20000'];
             $rules["{$locale}.seo_title"] = ['nullable', 'string', 'max:255'];
             $rules["{$locale}.seo_description"] = ['nullable', 'string', 'max:500'];
-            $rules["specifications.*.{$locale}.label"] = ['required', 'string', 'max:100'];
-            $rules["specifications.*.{$locale}.value"] = ['required', 'string', 'max:255'];
+            $rules["specifications.*.{$locale}.label"] = [...$this->requiredInLanguage($locale, "specifications.*.{$locale}", ['value']), 'string', 'max:100'];
+            $rules["specifications.*.{$locale}.value"] = [...$this->requiredInLanguage($locale, "specifications.*.{$locale}", ['label']), 'string', 'max:255'];
         }
 
         return $rules;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return $this->translationMessages();
     }
 
     /**
@@ -137,21 +153,24 @@ class StoreProductRequest extends FormRequest
     }
 
     /**
+     * Translated attributes keyed by locale; optional languages left empty are omitted.
+     *
      * @return array<string, array<string, string|null>>
      */
     public function translations(): array
     {
-        return collect($this->locales())
+        return $this->withoutEmptyLanguages(collect($this->locales())
             ->mapWithKeys(fn (string $locale): array => [
                 $locale => collect(self::TRANSLATED_FIELDS)
                     ->mapWithKeys(fn (string $field): array => [$field => $this->validated("{$locale}.{$field}")])
                     ->all(),
             ])
-            ->all();
+            ->all());
     }
 
     /**
-     * Specifications in display order, each with its translations keyed by locale.
+     * Specifications in display order, each with its translations keyed by locale
+     * (optional languages left empty are omitted).
      *
      * @return list<array{id: int|null, translations: array<string, array{label: string, value: string}>}>
      */
@@ -161,6 +180,7 @@ class StoreProductRequest extends FormRequest
             ->map(fn (array $specification): array => [
                 'id' => isset($specification['id']) ? (int) $specification['id'] : null,
                 'translations' => collect($this->locales())
+                    ->filter(fn (string $locale): bool => Locales::isRequired($locale) || filled($specification[$locale]['label'] ?? null))
                     ->mapWithKeys(fn (string $locale): array => [$locale => [
                         'label' => $specification[$locale]['label'],
                         'value' => $specification[$locale]['value'],
@@ -192,13 +212,5 @@ class StoreProductRequest extends FormRequest
     protected function ignoredProductId(): ?int
     {
         return null;
-    }
-
-    /**
-     * @return list<string>
-     */
-    protected function locales(): array
-    {
-        return config('translatable.locales');
     }
 }

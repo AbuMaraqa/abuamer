@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\SlideLinkType;
+use App\Models\Concerns\HasTranslations;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
 use Database\Factories\SlideFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -24,7 +24,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class Slide extends Model implements HasMedia, TranslatableContract
 {
     /** @use HasFactory<SlideFactory> */
-    use HasFactory, InteractsWithMedia, Translatable;
+    use HasFactory, HasTranslations, InteractsWithMedia;
 
     public const string IMAGE_COLLECTION = 'slide_image';
 

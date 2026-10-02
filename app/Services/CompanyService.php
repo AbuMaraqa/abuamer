@@ -19,7 +19,7 @@ class CompanyService
     public function save(Company $company, ?int $foundedYear, array $translations, array $highlights): void
     {
         DB::transaction(function () use ($company, $foundedYear, $translations, $highlights) {
-            $company->fill(['founded_year' => $foundedYear, ...$translations])->save();
+            $company->fillWithTranslations(['founded_year' => $foundedYear, ...$translations])->save();
 
             foreach ($highlights as $type => $items) {
                 $this->syncHighlights(HighlightType::from($type), $items);
@@ -41,7 +41,7 @@ class CompanyService
             // Ids of another type (or unknown ids) are treated as new rows.
             $highlight = $existing->get($item['id'] ?? 0) ?? new CompanyHighlight(['type' => $type]);
 
-            $highlight->fill([
+            $highlight->fillWithTranslations([
                 'icon' => $item['icon'],
                 'value' => $item['value'],
                 'sort_order' => $index + 1,

@@ -29,7 +29,7 @@ class ProductService
         array $galleryUploads = [],
     ): Product {
         DB::transaction(function () use ($product, $attributes, $specifications) {
-            $product->fill($attributes)->save();
+            $product->fillWithTranslations($attributes)->save();
 
             $this->syncSpecifications($product, $specifications);
         });
@@ -54,7 +54,7 @@ class ProductService
             // Ids that do not belong to this product are treated as new rows.
             $model = $existing->get($specification['id'] ?? 0) ?? $product->specifications()->make();
 
-            $model->fill(['sort_order' => $index + 1, ...$specification['translations']])->save();
+            $model->fillWithTranslations(['sort_order' => $index + 1, ...$specification['translations']])->save();
             $keptIds[] = $model->id;
         }
 

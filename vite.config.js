@@ -38,6 +38,19 @@ export default defineConfig({
                     subsets: ['arabic'],
                     preload: false,
                 }),
+                // Hebrew glyphs, used after the fonts above; browsers download them only for Hebrew text.
+                bunny('IBM Plex Sans Hebrew', {
+                    alias: 'hebrew-body',
+                    weights: [300, 400, 500, 600, 700],
+                    subsets: ['hebrew'],
+                    preload: false,
+                }),
+                bunny('Frank Ruhl Libre', {
+                    alias: 'hebrew-display',
+                    weights: [400, 500, 600],
+                    subsets: ['hebrew'],
+                    preload: false,
+                }),
             ],
         }),
         inertia({

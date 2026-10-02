@@ -234,6 +234,7 @@ final class CategoryTree
     /**
      * Resolve a nested URL path such as ["porcelain", "marble-effect"] segment by segment:
      * each slug must belong to a child of the category matched by the previous segment.
+     * A category without a translation in $locale is matched by its fallback slug, as in slugPath().
      *
      * @param  list<string>  $slugs
      */
@@ -244,7 +245,7 @@ final class CategoryTree
 
         foreach ($slugs as $slug) {
             $match = $this->children($parentId)
-                ->first(fn (Category $category): bool => $category->translate($locale)?->slug === $slug);
+                ->first(fn (Category $category): bool => $category->translate($locale, true)?->slug === $slug);
 
             if ($match === null) {
                 return null;

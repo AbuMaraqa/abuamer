@@ -90,10 +90,10 @@ class CategoryController extends Controller
     public function update(UpdateCategoryRequest $request, Category $category): RedirectResponse
     {
         DB::transaction(function () use ($request, $category) {
-            $category->update([
+            $category->fillWithTranslations([
                 'status' => $request->boolean('status'),
                 ...$request->translations(),
-            ]);
+            ])->save();
 
             if ($request->parentId() !== $category->parent_id) {
                 $this->categoryTree->move($category, $request->parentId(), PHP_INT_MAX);

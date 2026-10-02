@@ -11,6 +11,7 @@ use App\Services\Catalog\CategoryTreeService;
 use App\Settings\ContactSettings;
 use App\Settings\SiteSettings;
 use App\Settings\SocialSettings;
+use App\Support\Locales;
 use App\Support\Localized;
 use App\Support\Seo\SeoMeta;
 use Illuminate\Http\Request;
@@ -75,7 +76,13 @@ class HandleInertiaRequests extends Middleware
                 'supported' => collect(LaravelLocalization::getLocalesOrder())
                     ->map(fn (array $properties, string $code): array => [
                         'code' => $code,
+                        'name' => $properties['name'],
                         'native' => $properties['native'],
+                        'direction' => Locales::direction($code),
+                        'script' => Locales::script($code),
+                        // Content forms require these languages; the others fall back when left empty.
+                        'required' => Locales::isRequired($code),
+                        'fallback' => Locales::fallbackFor($code),
                     ])
                     ->values(),
             ],

@@ -139,6 +139,33 @@ describe('store', function () {
         expect(Category::count())->toBe(0);
     });
 
+    it('saves an optional Hebrew translation with a Hebrew slug without vowel marks', function () {
+        $response = $this->actingAs(admin())->post(route('admin.categories.store'), categoryPayload([
+            'he' => ['name' => 'פּוֹרְצֶלָן יוקרתי', 'slug' => '', 'description' => ''],
+        ]));
+
+        $response->assertSessionHasNoErrors();
+        expect(Category::sole()->translate('he')->slug)->toBe('פורצלן-יוקרתי');
+    });
+
+    it('leaves Hebrew out when all of its fields are empty', function () {
+        $response = $this->actingAs(admin())->post(route('admin.categories.store'), categoryPayload([
+            'he' => ['name' => '', 'slug' => '', 'description' => ''],
+        ]));
+
+        $response->assertSessionHasNoErrors();
+        expect(Category::sole()->hasTranslation('he'))->toBeFalse();
+    });
+
+    it('requires the Hebrew name once another Hebrew field is filled', function () {
+        $response = $this->actingAs(admin())->post(route('admin.categories.store'), categoryPayload([
+            'he' => ['name' => '', 'slug' => '', 'description' => 'קולקציית פורצלן'],
+        ]));
+
+        $response->assertSessionHasErrors(['he.name' => 'أدخل الاسم (العبرية) أيضًا، أو اترك جميع حقول هذه اللغة فارغة.']);
+        expect(Category::count())->toBe(0);
+    });
+
     it('reports validation errors in Arabic with readable field names', function () {
         $response = $this->actingAs(admin())->post(route('admin.categories.store'), categoryPayload(['en' => ['name' => '']]));
 
@@ -192,6 +219,19 @@ describe('update', function () {
         expect($category->status)->toBeFalse()
             ->and($category->translate('ar')->slug)->toBe('بورسلان-فاخر')
             ->and($category->translate('en')->name)->toBe('Fine Porcelain');
+    });
+
+    it('removes the Hebrew translation when its fields are cleared', function () {
+        $category = Category::factory()->named('Porcelain', 'بورسلان')->withHebrew('פורצלן')->create();
+
+        $response = $this->actingAs(admin())->put(route('admin.categories.update', $category), categoryPayload([
+            'he' => ['name' => '', 'slug' => '', 'description' => ''],
+        ]));
+
+        $response->assertSessionHasNoErrors();
+        $category->refresh();
+        expect($category->hasTranslation('he'))->toBeFalse()
+            ->and($category->translate('en')->name)->toBe('Porcelain');
     });
 
     it('keeps its own slug without reporting a clash with itself', function () {

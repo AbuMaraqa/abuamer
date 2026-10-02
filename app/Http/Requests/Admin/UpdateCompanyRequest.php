@@ -4,7 +4,9 @@ namespace App\Http\Requests\Admin;
 
 use App\Enums\HighlightType;
 use App\Enums\Permission;
+use App\Http\Requests\Concerns\ValidatesTranslations;
 use App\Models\CompanyHighlight;
+use App\Support\Locales;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
@@ -16,6 +18,8 @@ use Illuminate\Validation\Rule;
  */
 class UpdateCompanyRequest extends FormRequest
 {
+    use ValidatesTranslations;
+
     /**
      * Translated text fields with their maximum lengths.
      */
@@ -82,19 +86,31 @@ class UpdateCompanyRequest extends FormRequest
         }
 
         foreach ($this->locales() as $locale) {
-            $rules[$locale] = ['required', 'array'];
+            $rules[$locale] = $this->languageRules($locale);
 
             foreach (self::TEXT_FIELDS as $field => $maxLength) {
-                $rules["{$locale}.{$field}"] = [$field === 'name' ? 'required' : 'nullable', 'string', "max:{$maxLength}"];
+                $rules["{$locale}.{$field}"] = [
+                    ...($field === 'name' ? $this->requiredInLanguage($locale, $locale, array_keys(array_diff_key(self::TEXT_FIELDS, ['name' => true]))) : ['nullable']),
+                    'string',
+                    "max:{$maxLength}",
+                ];
             }
 
             foreach (array_keys(self::HIGHLIGHT_LISTS) as $list) {
-                $rules["{$list}.*.{$locale}.title"] = ['required', 'string', 'max:120'];
+                $rules["{$list}.*.{$locale}.title"] = [...$this->requiredInLanguage($locale, "{$list}.*.{$locale}", ['description']), 'string', 'max:120'];
                 $rules["{$list}.*.{$locale}.description"] = ['nullable', 'string', 'max:500'];
             }
         }
 
         return $rules;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return $this->translationMessages();
     }
 
     /**
@@ -117,17 +133,19 @@ class UpdateCompanyRequest extends FormRequest
     }
 
     /**
+     * Translated texts keyed by locale; optional languages left empty are omitted.
+     *
      * @return array<string, array<string, string|null>>
      */
     public function translations(): array
     {
-        return collect($this->locales())
+        return $this->withoutEmptyLanguages(collect($this->locales())
             ->mapWithKeys(fn (string $locale): array => [
                 $locale => collect(array_keys(self::TEXT_FIELDS))
                     ->mapWithKeys(fn (string $field): array => [$field => $this->validated("{$locale}.{$field}")])
                     ->all(),
             ])
-            ->all();
+            ->all());
     }
 
     /**
@@ -146,6 +164,7 @@ class UpdateCompanyRequest extends FormRequest
                     'icon' => $type === HighlightType::Feature ? $item['icon'] : null,
                     'value' => $type === HighlightType::Statistic ? $item['value'] : null,
                     'translations' => collect($this->locales())
+                        ->filter(fn (string $locale): bool => Locales::isRequired($locale) || filled($item[$locale]['title'] ?? null))
                         ->mapWithKeys(fn (string $locale): array => [$locale => [
                             'title' => $item[$locale]['title'],
                             'description' => $item[$locale]['description'] ?? null,
@@ -173,13 +192,5 @@ class UpdateCompanyRequest extends FormRequest
     public function galleryUploads(): array
     {
         return array_values($this->file('gallery_uploads', []));
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function locales(): array
-    {
-        return config('translatable.locales');
     }
 }

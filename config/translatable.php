@@ -15,6 +15,36 @@ return [
     'locales' => [
         'ar',
         'en',
+        'he',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Required Locales (application setting)
+    |--------------------------------------------------------------------------
+    |
+    | Content must be written in these languages. The other languages are
+    | optional per item and fall back (see "fallbacks") when left empty.
+    |
+    */
+    'required_locales' => [
+        'ar',
+        'en',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fallback Per Locale (application setting)
+    |--------------------------------------------------------------------------
+    |
+    | The language shown when a translation is missing, used by the models'
+    | App\Models\Concerns\HasTranslations trait and App\Support\Localized.
+    |
+    */
+    'fallbacks' => [
+        'ar' => 'en',
+        'en' => 'ar',
+        'he' => 'en',
     ],
 
     /*
@@ -80,6 +110,8 @@ return [
     | one existing is found or end of list reached. The locales are looped
     | from top to bottom and for country based locales the simple one
     | is used first. So "es" will be checked before "es_MX".
+    |
+    | The application's models use the per-locale "fallbacks" above instead.
     |
     */
     'fallback_locale' => 'ar',

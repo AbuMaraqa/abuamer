@@ -105,7 +105,9 @@ onBeforeUnmount(() => {
             </nav>
 
             <div class="flex items-center gap-4">
-                <LanguageSwitcher class="hidden text-sm font-medium sm:inline-flex" />
+                <div class="hidden sm:block">
+                    <LanguageSwitcher class="text-sm font-medium" />
+                </div>
                 <AppButton :href="route('contact')" :variant="isTransparent ? 'secondary' : 'primary'" class="hidden md:inline-flex">
                     {{ $t('Request a quote') }}
                 </AppButton>

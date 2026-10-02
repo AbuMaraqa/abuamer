@@ -155,6 +155,31 @@ describe('store', function () {
         $response->assertSessionHasErrors(['specifications.0.en.value']);
     });
 
+    it('saves the Hebrew texts of the product and of each specification written in Hebrew', function () {
+        $response = $this->actingAs(admin())->post(route('admin.products.store'), productPayload(Category::factory()->create(), [
+            'he' => ['name' => 'קלקטה זהב 60×120', 'slug' => ''],
+            'specifications' => [
+                ['id' => null, 'ar' => ['label' => 'المقاس', 'value' => '60 × 120 سم'], 'en' => ['label' => 'Size', 'value' => '60 × 120 cm'], 'he' => ['label' => 'מידה', 'value' => '60 × 120 ס״מ']],
+                ['id' => null, 'ar' => ['label' => 'السماكة', 'value' => '9 مم'], 'en' => ['label' => 'Thickness', 'value' => '9 mm'], 'he' => ['label' => '', 'value' => '']],
+            ],
+        ]));
+
+        $response->assertSessionHasNoErrors();
+        $product = Product::query()->with('specifications.translations')->sole();
+        expect($product->translate('he')->slug)->toBe('קלקטה-זהב-60x120')
+            ->and($product->specifications->map(fn (ProductSpecification $specification) => $specification->hasTranslation('he'))->all())->toBe([true, false]);
+    });
+
+    it('requires the Hebrew value of a specification named in Hebrew', function () {
+        $response = $this->actingAs(admin())->post(route('admin.products.store'), productPayload(Category::factory()->create(), [
+            'specifications' => [
+                ['id' => null, 'ar' => ['label' => 'المقاس', 'value' => '60 × 120 سم'], 'en' => ['label' => 'Size', 'value' => '60 × 120 cm'], 'he' => ['label' => 'מידה', 'value' => '']],
+            ],
+        ]));
+
+        $response->assertSessionHasErrors(['specifications.0.he.value']);
+    });
+
     it('rejects an image that is too small', function () {
         Storage::fake('public');
 
@@ -192,6 +217,23 @@ describe('update', function () {
             ->and($specifications->last()->id)->toBe($size->id)
             ->and($specifications->last()->translate('en')->value)->toBe('120 × 120 cm');
         $this->assertModelMissing($removed);
+    });
+
+    it('removes the Hebrew texts of the product and its specifications when they are cleared', function () {
+        $product = Product::factory()->withHebrew('קלקטה זהב')->create();
+        $size = ProductSpecification::factory()->for($product)->create(['he' => ['label' => 'מידה', 'value' => '60 × 120 ס״מ']]);
+
+        $response = $this->actingAs(admin())->put(route('admin.products.update', $product), productPayload($product->category, [
+            'he' => ['name' => '', 'slug' => '', 'short_description' => ''],
+            'specifications' => [
+                ['id' => $size->id, 'ar' => ['label' => 'المقاس', 'value' => '60 × 120 سم'], 'en' => ['label' => 'Size', 'value' => '60 × 120 cm'], 'he' => ['label' => '', 'value' => '']],
+            ],
+        ]));
+
+        $response->assertSessionHasNoErrors();
+        expect($product->fresh()->hasTranslation('he'))->toBeFalse()
+            ->and($size->fresh()->hasTranslation('he'))->toBeFalse()
+            ->and($size->fresh()->translate('en')->label)->toBe('Size');
     });
 
     it('does not take over a specification that belongs to another product', function () {

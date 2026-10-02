@@ -70,7 +70,7 @@ function error(index, path) {
                     </div>
 
                     <div class="grid gap-3 md:grid-cols-2">
-                        <div v-for="locale in locales" :key="locale.code" :dir="locale.code === 'ar' ? 'rtl' : 'ltr'" :lang="locale.code" class="flex flex-col gap-2">
+                        <div v-for="locale in locales" :key="locale.code" :dir="locale.direction" :lang="locale.code" class="flex flex-col gap-2">
                             <TextInput
                                 v-model="item[locale.code].title"
                                 :placeholder="`${kind === 'statistic' ? t('Label') : t('Title')} (${locale.native})`"

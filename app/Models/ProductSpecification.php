@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
-use Astrotomic\Translatable\Translatable;
 use Database\Factories\ProductSpecificationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProductSpecification extends Model implements TranslatableContract
 {
     /** @use HasFactory<ProductSpecificationFactory> */
-    use HasFactory, Translatable;
+    use HasFactory, HasTranslations;
 
     /**
      * @var list<string>

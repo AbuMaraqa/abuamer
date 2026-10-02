@@ -7,11 +7,12 @@
  * Nasaq design tokens: warm stone neutrals with a brass accent.
  * Font families are self-hosted by the Vite fonts plugin (see vite.config.js), which
  * exposes them as --font-{alias}. The root view sets --font-site to the body font
- * chosen in the control panel (App\Enums\SiteFont).
+ * chosen in the control panel (App\Enums\SiteFont). The Hebrew fonts come last and
+ * only supply Hebrew glyphs; their fallbacks keep the stack valid where they are not loaded.
  */
 @theme {
-    --font-sans: var(--font-site, var(--font-ibm-plex-sans-arabic)), ui-sans-serif, system-ui, sans-serif;
-    --font-display: var(--font-display-latin), var(--font-display-arabic), ui-serif, Georgia, serif;
+    --font-sans: var(--font-site, var(--font-ibm-plex-sans-arabic)), var(--font-hebrew-body, ui-sans-serif), ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-display-latin), var(--font-display-arabic), var(--font-hebrew-display, ui-serif), ui-serif, Georgia, serif;
 
     --color-ink: #1d1b18;
     --color-ink-soft: #3b3732;

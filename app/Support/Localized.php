@@ -6,7 +6,7 @@ final class Localized
 {
     /**
      * Pick the current locale's text from a per-locale array (as stored in settings),
-     * falling back to Arabic and then to any non-empty value.
+     * falling back to the locale's fallback language and then to any non-empty value.
      *
      * @param  array<string, string|null>  $values
      */
@@ -14,8 +14,12 @@ final class Localized
     {
         $locale ??= app()->getLocale();
 
-        return (string) (filled($values[$locale] ?? null)
-            ? $values[$locale]
-            : (filled($values['ar'] ?? null) ? $values['ar'] : collect($values)->first(fn (?string $value): bool => filled($value), '')));
+        foreach ([$locale, Locales::fallbackFor($locale)] as $candidate) {
+            if (filled($values[$candidate] ?? null)) {
+                return (string) $values[$candidate];
+            }
+        }
+
+        return (string) collect($values)->first(fn (?string $value): bool => filled($value), '');
     }
 }

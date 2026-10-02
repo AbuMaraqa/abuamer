@@ -72,13 +72,17 @@ class ProductController extends Controller
 
         $product = Product::query()->active()->whereTranslation('slug', $slug, $locale)->first();
 
+        // A slug of another language: redirect to this language's URL. A product without a
+        // translation in this language is shown under its fallback language's slug.
         if ($product === null) {
             $product = Product::query()->active()->whereTranslation('slug', $slug)->with('translations')->first();
-            $localizedSlug = $product?->translate($locale)?->slug;
+            $localizedSlug = $product?->translate($locale, true)?->slug;
 
             abort_if($localizedSlug === null, 404);
 
-            return redirect()->route('products.show', ['slug' => $localizedSlug], 301);
+            if ($localizedSlug !== $slug) {
+                return redirect()->route('products.show', ['slug' => $localizedSlug], 301);
+            }
         }
 
         abort_unless($tree->isVisible($product->category_id), 404);

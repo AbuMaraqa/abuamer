@@ -22,6 +22,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@nasaq.test',
         ])->assignRole(Role::Admin);
 
-        $this->call([CompanySeeder::class, CatalogSeeder::class, SlideSeeder::class]);
+        $this->call([CompanySeeder::class, CatalogSeeder::class, SlideSeeder::class, HebrewContentSeeder::class]);
     }
 }

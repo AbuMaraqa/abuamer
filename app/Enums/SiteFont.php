@@ -20,12 +20,13 @@ enum SiteFont: string
     }
 
     /**
-     * Font aliases the public pages load: the chosen body font and the display fonts.
+     * Font aliases the public pages load: the chosen body font, the display fonts and
+     * the Hebrew fonts that supply the glyphs the others lack.
      *
      * @return list<string>
      */
     public function publicFontAliases(): array
     {
-        return [$this->value, 'display-latin', 'display-arabic'];
+        return [$this->value, 'display-latin', 'display-arabic', 'hebrew-body', 'hebrew-display'];
     }
 }

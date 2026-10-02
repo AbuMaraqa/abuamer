@@ -113,6 +113,32 @@ describe('show', function () {
             ->assertStatus(301);
     });
 
+    it('shows a product without Hebrew texts in English on Hebrew pages', function () {
+        $this->useRoutingLocale('he');
+        $product = Product::factory()->named('Calacatta Gold', 'كالاكاتا ذهبي')->create();
+
+        $response = $this->get(route('products.show', ['slug' => 'calacatta-gold']));
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Catalog/Product')
+            ->where('product.id', $product->id)
+            ->where('product.name', 'Calacatta Gold'));
+    });
+
+    it('redirects a Hebrew page addressed with another slug to the slug the product is shown with', function (bool $hasHebrew, string $expectedSlug) {
+        $this->useRoutingLocale('he');
+        $factory = Product::factory()->named('Calacatta Gold', 'كالاكاتا ذهبي');
+        ($hasHebrew ? $factory->withHebrew('קלקטה זהב') : $factory)->create();
+
+        $response = $this->get(route('products.show', ['slug' => 'كالاكاتا-ذهبي']));
+
+        $response->assertRedirect(route('products.show', ['slug' => $expectedSlug]))
+            ->assertStatus(301);
+    })->with([
+        'with a Hebrew translation' => [true, 'קלקטה-זהב'],
+        'without a Hebrew translation' => [false, 'calacatta-gold'],
+    ]);
+
     it('returns 404 for an inactive product', function () {
         $product = Product::factory()->inactive()->create();
 
