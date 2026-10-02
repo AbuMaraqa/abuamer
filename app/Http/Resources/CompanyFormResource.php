@@ -43,8 +43,6 @@ class CompanyFormResource extends JsonResource
                     ->mapWithKeys(fn (string $field): array => [$field => $translations[$locale]->{$field} ?? ''])
                     ->all(),
             ]),
-            'logo' => $this->mediaData(Company::LOGO_COLLECTION, $request),
-            'favicon' => $this->mediaData(Company::FAVICON_COLLECTION, $request),
             'hero_image' => $this->mediaData(Company::HERO_COLLECTION, $request),
             'about_image' => $this->mediaData(Company::ABOUT_COLLECTION, $request),
             'gallery' => MediaResource::collection($this->getMedia(Company::GALLERY_COLLECTION))->resolve($request),

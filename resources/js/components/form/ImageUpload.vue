@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeUnmount, ref, useId } from 'vue';
+import { computed, onBeforeUnmount, ref, useId, watch } from 'vue';
 import Icon from '../common/Icon.vue';
 
 /**
@@ -13,10 +13,20 @@ const props = defineProps({
     // Show the whole image (logos, icons) instead of cropping it to fill the frame.
     contain: { type: Boolean, default: false },
     accept: { type: String, default: 'image/jpeg,image/png,image/webp' },
+    // Preview on a dark background (logos meant for dark areas).
+    dark: { type: Boolean, default: false },
 });
 
 const file = defineModel({ type: [File, null], default: null });
 const removed = defineModel('removed', { type: Boolean, default: false });
+
+// When the form resets the file after saving, show the stored image again instead of the local preview.
+watch(file, (value) => {
+    if (value === null && previewUrl.value) {
+        URL.revokeObjectURL(previewUrl.value);
+        previewUrl.value = null;
+    }
+});
 
 const inputId = useId();
 const previewUrl = ref(null);
@@ -58,7 +68,7 @@ onBeforeUnmount(() => previewUrl.value && URL.revokeObjectURL(previewUrl.value))
 
 <template>
     <div class="flex flex-col gap-2">
-        <div v-if="shownImage" class="group relative overflow-hidden rounded-xl border border-line bg-sand-100">
+        <div v-if="shownImage" class="group relative overflow-hidden rounded-xl border border-line" :class="dark ? 'bg-ink' : 'bg-sand-100'">
             <img :src="shownImage" alt="" class="aspect-[4/3] w-full" :class="contain ? 'object-contain p-6' : 'object-cover'" />
             <div class="absolute inset-x-0 bottom-0 flex justify-end gap-2 bg-gradient-to-t from-ink/60 to-transparent p-3">
                 <label :for="inputId" class="cursor-pointer rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-ink hover:bg-white">
@@ -74,7 +84,10 @@ onBeforeUnmount(() => previewUrl.value && URL.revokeObjectURL(previewUrl.value))
             v-else
             :for="inputId"
             class="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 text-center transition-colors"
-            :class="isDragging ? 'border-brass-500 bg-brass-300/10' : error ? 'border-danger/50' : 'border-line hover:border-sand-400'"
+            :class="[
+                isDragging ? 'border-brass-500 bg-brass-300/10' : error ? 'border-danger/50' : 'border-line hover:border-sand-400',
+                { 'bg-ink/95 [&_span]:text-sand-300': dark && !isDragging },
+            ]"
             @dragover.prevent="isDragging = true"
             @dragleave="isDragging = false"
             @drop.prevent="onDrop"

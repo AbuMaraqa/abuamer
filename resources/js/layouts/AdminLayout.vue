@@ -5,6 +5,7 @@ import { route } from 'ziggy-js';
 import FlashToaster from '../components/common/FlashToaster.vue';
 import Icon from '../components/common/Icon.vue';
 import LanguageSwitcher from '../components/common/LanguageSwitcher.vue';
+import SiteLogo from '../components/layout/SiteLogo.vue';
 
 const page = usePage();
 const isSidebarOpen = ref(false);
@@ -16,6 +17,7 @@ const navigation = [
     { label: 'Dashboard', icon: 'layout', routeName: 'admin.dashboard', active: 'admin.dashboard' },
     { label: 'Categories', icon: 'folder-tree', routeName: 'admin.categories.index', active: 'admin.categories.*', permission: 'categories.view' },
     { label: 'Products', icon: 'box', routeName: 'admin.products.index', active: 'admin.products.*', permission: 'products.view' },
+    { label: 'Slider', icon: 'image', routeName: 'admin.slides.index', active: 'admin.slides.*', permission: 'company.manage' },
     { label: 'Company', icon: 'building', routeName: 'admin.company.edit', active: 'admin.company.*', permission: 'company.manage' },
     { label: 'Messages', icon: 'mail', routeName: 'admin.messages.index', active: 'admin.messages.*', permission: 'messages.manage', badge: 'unreadMessages' },
     { label: 'Settings', icon: 'settings', routeName: 'admin.settings.edit', active: 'admin.settings.*', permission: 'settings.manage' },
@@ -44,7 +46,7 @@ onBeforeUnmount(removeNavigateListener);
             :class="{ 'max-lg:ltr:-translate-x-full max-lg:rtl:translate-x-full': !isSidebarOpen }"
         >
             <div class="flex items-center justify-between px-6 py-6">
-                <Link :href="route('admin.dashboard')" class="font-display text-2xl text-white">{{ $page.props.appName }}</Link>
+                <SiteLogo :href="route('admin.dashboard')" inverted size="sm" />
                 <button type="button" class="text-sand-300 hover:text-white lg:hidden" :aria-label="$t('Close menu')" @click="isSidebarOpen = false">
                     <Icon name="x" />
                 </button>

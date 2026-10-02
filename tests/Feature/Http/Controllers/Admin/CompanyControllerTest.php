@@ -96,25 +96,15 @@ it('requires the statistic figure', function () {
     $response->assertSessionHasErrors('statistics.0.value');
 });
 
-it('stores the logo and refuses SVG files', function (string $file, bool $accepted) {
+it('stores the hero image', function () {
     Storage::fake('public');
-    $upload = str_ends_with($file, '.svg')
-        ? UploadedFile::fake()->createWithContent($file, '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>')
-        : UploadedFile::fake()->image($file, 400, 120);
 
-    $response = $this->actingAs(admin())->put(route('admin.company.update'), companyPayload(['logo' => $upload]));
+    $this->actingAs(admin())->put(route('admin.company.update'), companyPayload([
+        'hero_image' => UploadedFile::fake()->image('hero.jpg', 1920, 1080),
+    ]));
 
-    if ($accepted) {
-        $response->assertSessionHasNoErrors();
-        expect(Company::current()->getFirstMedia(Company::LOGO_COLLECTION)->file_name)->toBe($file);
-    } else {
-        $response->assertSessionHasErrors('logo');
-        expect(Company::current()->getFirstMedia(Company::LOGO_COLLECTION))->toBeNull();
-    }
-})->with([
-    'PNG logo' => ['logo.png', true],
-    'SVG logo' => ['logo.svg', false],
-]);
+    expect(Company::current()->getFirstMedia(Company::HERO_COLLECTION)->file_name)->toBe('hero.jpg');
+});
 
 it('forbids users who cannot manage the company content', function () {
     $response = $this->actingAs(userWithPermissions(Permission::ProductsView))->put(route('admin.company.update'), companyPayload());

@@ -6,12 +6,14 @@ import Icon from '../components/common/Icon.vue';
 import ProductGrid from '../components/products/ProductGrid.vue';
 import CtaSection from '../components/sections/CtaSection.vue';
 import FeatureGrid from '../components/sections/FeatureGrid.vue';
+import HeroSlider from '../components/sections/HeroSlider.vue';
 import SectionHeading from '../components/sections/SectionHeading.vue';
 import StatisticsBand from '../components/sections/StatisticsBand.vue';
 import { useTranslations } from '../composables/useTranslations';
 
 defineProps({
     company: { type: Object, required: true },
+    slides: { type: Array, required: true },
     collections: { type: Array, required: true },
     featuredProducts: { type: Array, required: true },
     features: { type: Array, required: true },
@@ -22,8 +24,10 @@ const { t } = useTranslations();
 </script>
 
 <template>
-    <!-- Hero -->
-    <section class="relative isolate flex min-h-[92svh] items-end overflow-hidden bg-ink text-white">
+    <HeroSlider v-if="slides.length > 0" :slides="slides" />
+
+    <!-- Static hero, shown until slides are added in the control panel -->
+    <section v-else class="relative isolate flex min-h-[92svh] items-end overflow-hidden bg-ink text-white">
         <img
             v-if="company.hero_image"
             :src="company.hero_image.large"

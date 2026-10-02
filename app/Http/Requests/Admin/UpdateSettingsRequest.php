@@ -48,6 +48,14 @@ class UpdateSettingsRequest extends FormRequest
             'site.default_locale' => ['required', Rule::in(config('translatable.locales'))],
             'site.maintenance_mode' => ['required', 'boolean'],
             'site.font' => ['required', Rule::enum(SiteFont::class)],
+
+            // SVG is not accepted: it can carry scripts and would be served from the site's origin.
+            'logo' => ['nullable', 'image', 'mimes:png,webp', 'max:2048', 'dimensions:min_width=120,min_height=40'],
+            'logo_light' => ['nullable', 'image', 'mimes:png,webp', 'max:2048', 'dimensions:min_width=120,min_height=40'],
+            'favicon' => ['nullable', 'image', 'mimes:png', 'max:1024', 'dimensions:min_width=48,ratio=1'],
+            'remove_logo' => ['boolean'],
+            'remove_logo_light' => ['boolean'],
+            'remove_favicon' => ['boolean'],
         ];
 
         foreach (config('translatable.locales') as $locale) {
@@ -67,8 +75,21 @@ class UpdateSettingsRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'favicon.dimensions' => __('The browser icon must be a square image of at least 48 × 48 pixels.'),
             'contact.whatsapp.regex' => __('Enter the WhatsApp number in international format without "+" or spaces, e.g. 9665XXXXXXXX.'),
             'contact.map_embed_url.starts_with' => __('Paste the "src" address of the Google Maps embed code (it starts with https://www.google.com/maps/embed).'),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'logo' => __('Logo'),
+            'logo_light' => __('Logo for dark backgrounds'),
+            'favicon' => __('Browser icon (favicon)'),
         ];
     }
 

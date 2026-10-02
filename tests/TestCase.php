@@ -35,6 +35,17 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Start every test request with fresh request-scoped services (category tree,
+     * company profile), as each real request does.
+     */
+    public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+    {
+        $this->app->forgetScopedInstances();
+
+        return parent::call($method, $uri, $parameters, $cookies, $files, $server, $content);
+    }
+
+    /**
      * Re-boot the application with routes registered for another locale.
      * Records created before calling this method are discarded.
      */

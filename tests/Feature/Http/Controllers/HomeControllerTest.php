@@ -3,6 +3,7 @@
 use App\Models\Category;
 use App\Models\CompanyHighlight;
 use App\Models\Product;
+use App\Models\Slide;
 use Inertia\Testing\AssertableInertia as Assert;
 
 it('renders the company content, collections, featured products and highlights', function () {
@@ -31,6 +32,32 @@ it('leaves out featured products from hidden categories', function () {
     $response = $this->get(route('home'));
 
     $response->assertInertia(fn (Assert $page) => $page->has('featuredProducts', 0));
+});
+
+it('shows visible slides in order with their links resolved for the language', function () {
+    $porcelain = Category::factory()->named('Porcelain', 'بورسلان')->create();
+    $second = Slide::factory()->linkedTo($porcelain)->create(['sort_order' => 2]);
+    $first = Slide::factory()->create(['sort_order' => 1]);
+    Slide::factory()->inactive()->create(['sort_order' => 0]);
+
+    $response = $this->get(route('home'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->has('slides', 2)
+        ->where('slides.0.id', $first->id)
+        ->where('slides.0.button', null)
+        ->where('slides.1.id', $second->id)
+        ->where('slides.1.button.label', 'اكتشف المجموعة')
+        ->where('slides.1.button.url', route('products.category', ['path' => 'بورسلان'])));
+});
+
+it('drops the button of a slide whose category is hidden', function () {
+    $hidden = Category::factory()->inactive()->create();
+    Slide::factory()->linkedTo($hidden)->create();
+
+    $response = $this->get(route('home'));
+
+    $response->assertInertia(fn (Assert $page) => $page->where('slides.0.button', null));
 });
 
 it('shares the visible collections as the navigation', function () {

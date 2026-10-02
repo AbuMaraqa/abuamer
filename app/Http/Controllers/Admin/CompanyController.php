@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Requests\Admin\UpdateCompanyRequest;
 use App\Http\Resources\CompanyFormResource;
 use App\Models\Company;
@@ -44,12 +45,14 @@ class CompanyController extends Controller
             $request->highlights(),
         );
 
-        foreach ([Company::LOGO_COLLECTION => 'logo', Company::FAVICON_COLLECTION => 'favicon', Company::HERO_COLLECTION => 'hero_image', Company::ABOUT_COLLECTION => 'about_image'] as $collection => $input) {
+        foreach ([Company::HERO_COLLECTION => 'hero_image', Company::ABOUT_COLLECTION => 'about_image'] as $collection => $input) {
             MediaSync::single($company, $collection, $request->file($input), $request->boolean("remove_{$input}"));
         }
 
         MediaSync::gallery($company, Company::GALLERY_COLLECTION, $request->galleryIds(), $request->galleryUploads());
 
+        // The company name and tagline appear in the header and footer of every page.
+        HandleInertiaRequests::refreshSiteData();
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Company content saved.')]);
 
         return to_route('admin.company.edit');

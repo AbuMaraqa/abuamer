@@ -10,6 +10,9 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SlideController;
+use App\Http\Controllers\Admin\SlideReorderController;
+use App\Http\Controllers\Admin\SlideStatusController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +35,11 @@ Route::resource('categories', CategoryController::class)->except('show');
 
 Route::patch('products/category', ProductCategoryController::class)->name('products.category');
 Route::resource('products', ProductController::class)->except('show');
+
+// Registered before the resource so "reorder" is not captured as a {slide} binding.
+Route::patch('slides/reorder', SlideReorderController::class)->name('slides.reorder');
+Route::patch('slides/{slide}/status', SlideStatusController::class)->name('slides.status');
+Route::resource('slides', SlideController::class)->except('show');
 
 Route::get('company', [CompanyController::class, 'edit'])->name('company.edit');
 Route::put('company', [CompanyController::class, 'update'])->name('company.update');

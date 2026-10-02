@@ -61,13 +61,8 @@ class UpdateCompanyRequest extends FormRequest
         $rules = [
             'founded_year' => ['nullable', 'integer', 'min:1900', 'max:'.now()->year],
 
-            // SVG is not accepted: it can carry scripts and would be served from the site's origin.
-            'logo' => ['nullable', 'image', 'mimes:png,webp', 'max:2048'],
-            'favicon' => ['nullable', 'image', 'mimes:png', 'max:1024', 'dimensions:min_width=48,ratio=1'],
             'hero_image' => ['nullable', ...self::PHOTO_RULES, 'dimensions:min_width=1600,min_height=900'],
             'about_image' => ['nullable', ...self::PHOTO_RULES, 'dimensions:min_width=800,min_height=600'],
-            'remove_logo' => ['boolean'],
-            'remove_favicon' => ['boolean'],
             'remove_hero_image' => ['boolean'],
             'remove_about_image' => ['boolean'],
             'gallery' => ['array'],

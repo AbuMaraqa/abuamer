@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\CompanyProfile;
+use App\Support\ImageTransparency;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -21,6 +22,11 @@ class Company extends Model implements HasMedia, TranslatableContract
     use InteractsWithMedia, Translatable;
 
     public const string LOGO_COLLECTION = 'logo';
+
+    /**
+     * Optional logo version for dark backgrounds (hero, footer, control panel sidebar).
+     */
+    public const string LOGO_LIGHT_COLLECTION = 'logo_light';
 
     public const string FAVICON_COLLECTION = 'favicon';
 
@@ -63,11 +69,30 @@ class Company extends Model implements HasMedia, TranslatableContract
         return app(CompanyProfile::class)->get();
     }
 
+    /**
+     * Whether the logo has a transparent background, detected once and remembered on the media.
+     */
+    public function logoIsTransparent(): bool
+    {
+        $logo = $this->getFirstMedia(self::LOGO_COLLECTION);
+
+        if ($logo === null) {
+            return false;
+        }
+
+        if (! $logo->hasCustomProperty('transparent')) {
+            $logo->setCustomProperty('transparent', ImageTransparency::detect($logo->getPath()))->save();
+        }
+
+        return (bool) $logo->getCustomProperty('transparent');
+    }
+
     public function registerMediaCollections(): void
     {
         $images = ['image/jpeg', 'image/png', 'image/webp'];
 
         $this->addMediaCollection(self::LOGO_COLLECTION)->singleFile()->acceptsMimeTypes(['image/png', 'image/webp']);
+        $this->addMediaCollection(self::LOGO_LIGHT_COLLECTION)->singleFile()->acceptsMimeTypes(['image/png', 'image/webp']);
         $this->addMediaCollection(self::FAVICON_COLLECTION)->singleFile()->acceptsMimeTypes(['image/png']);
         $this->addMediaCollection(self::HERO_COLLECTION)->singleFile()->acceptsMimeTypes($images);
         $this->addMediaCollection(self::ABOUT_COLLECTION)->singleFile()->acceptsMimeTypes($images);

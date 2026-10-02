@@ -30,6 +30,21 @@ class HandleInertiaRequests extends Middleware
     protected $rootView = 'app';
 
     /**
+     * Session flag that makes the next response resend the "site" data, which the
+     * browser otherwise keeps for the whole visit.
+     */
+    private const string REFRESH_SITE_KEY = 'inertia.refresh_site';
+
+    /**
+     * Resend the company identity and contact details on the next page, e.g. after
+     * they were changed in the control panel.
+     */
+    public static function refreshSiteData(): void
+    {
+        session()->flash(self::REFRESH_SITE_KEY, true);
+    }
+
+    /**
      * Determines the current asset version.
      *
      * @see https://inertiajs.com/asset-versioning
@@ -66,7 +81,8 @@ class HandleInertiaRequests extends Middleware
             ],
             'localeUrls' => fn (): array => $this->localeUrls(),
             'translations' => Inertia::once(fn (): array => $this->translations()),
-            'site' => Inertia::once(fn (): array => $this->site()),
+            'site' => Inertia::once(fn (): array => $this->site())
+                ->fresh((bool) $request->session()->get(self::REFRESH_SITE_KEY, false)),
             // Pages with their own metadata pass a "seo" prop that replaces this default.
             'seo' => fn (): array => SeoMeta::make()->noindex($request->routeIs('admin.*', 'login'))->toArray(),
             'auth' => [
@@ -93,6 +109,8 @@ class HandleInertiaRequests extends Middleware
             'name' => $company->name ?: config('app.name'),
             'tagline' => $company->tagline,
             'logo' => $company->getFirstMediaUrl(Company::LOGO_COLLECTION) ?: null,
+            'logoLight' => $company->getFirstMediaUrl(Company::LOGO_LIGHT_COLLECTION) ?: null,
+            'logoIsTransparent' => $company->logoIsTransparent(),
             'favicon' => $company->getFirstMediaUrl(Company::FAVICON_COLLECTION) ?: null,
             'font' => app(SiteSettings::class)->font()->value,
             'contact' => [

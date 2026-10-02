@@ -1,10 +1,11 @@
 <script setup>
-import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import { route } from 'ziggy-js';
 import HighlightsEditor from '../../../components/admin/HighlightsEditor.vue';
 import PageHeader from '../../../components/admin/PageHeader.vue';
 import AppButton from '../../../components/common/AppButton.vue';
+import Icon from '../../../components/common/Icon.vue';
 import FormField from '../../../components/form/FormField.vue';
 import ImageUpload from '../../../components/form/ImageUpload.vue';
 import TextareaInput from '../../../components/form/TextareaInput.vue';
@@ -43,7 +44,7 @@ const textFields = {
 };
 
 const tabs = [
-    { key: 'identity', label: 'Identity', fields: ['name', 'tagline', 'founded_year', 'logo', 'favicon'] },
+    { key: 'identity', label: 'Identity', fields: ['name', 'tagline', 'founded_year'] },
     { key: 'home', label: 'Home page', fields: ['hero_title', 'hero_subtitle', 'cta_title', 'cta_text', 'hero_image'] },
     { key: 'about', label: 'About page', fields: ['introduction', 'story', 'vision', 'mission', 'about_image'] },
     { key: 'highlights', label: 'Values & strengths', fields: ['values', 'features', 'statistics'] },
@@ -55,12 +56,8 @@ const activeTab = ref('identity');
 const form = useForm({
     founded_year: props.company.founded_year ?? '',
     ...Object.fromEntries(locales.map(({ code }) => [code, { ...props.company[code] }])),
-    logo: null,
-    favicon: null,
     hero_image: null,
     about_image: null,
-    remove_logo: false,
-    remove_favicon: false,
     remove_hero_image: false,
     remove_about_image: false,
     gallery_uploads: [],
@@ -152,15 +149,16 @@ function submit() {
                             <TextInput id="founded-year" v-model="form.founded_year" type="number" min="1900" dir="ltr" />
                         </FormField>
                     </section>
-                    <section class="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5">
-                        <h2 class="text-sm font-medium text-ink-soft">{{ t('Logo') }}</h2>
-                        <ImageUpload v-model="form.logo" v-model:removed="form.remove_logo" :current="company.logo" :error="form.errors.logo" accept="image/png,image/webp" contain :hint="t('A PNG or WebP with a transparent background.')" />
-                    </section>
-                    <section class="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5">
-                        <h2 class="text-sm font-medium text-ink-soft">{{ t('Browser icon (favicon)') }}</h2>
-                        <ImageUpload v-model="form.favicon" v-model:removed="form.remove_favicon" :current="company.favicon" :error="form.errors.favicon" accept="image/png" contain :hint="t('A square PNG, at least 48 × 48 pixels.')" />
-                    </section>
+                    <Link :href="route('admin.settings.edit')" class="flex items-center gap-3 rounded-2xl border border-dashed border-line p-5 text-sm text-muted transition-colors hover:border-sand-400 hover:text-ink">
+                        <Icon name="image" :size="18" class="shrink-0 text-brass-600" />
+                        {{ t('The logo and browser icon are managed in Settings.') }}
+                    </Link>
                 </template>
+
+                <Link v-if="group === 'home'" :href="route('admin.slides.index')" class="flex items-center gap-3 rounded-2xl border border-dashed border-line p-5 text-sm text-muted transition-colors hover:border-sand-400 hover:text-ink">
+                    <Icon name="image" :size="18" class="shrink-0 text-brass-600" />
+                    {{ t('When the slider has slides, they replace the hero headline and image below.') }}
+                </Link>
 
                 <section v-if="group === 'home'" class="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5">
                     <h2 class="text-sm font-medium text-ink-soft">{{ t('Hero image') }}</h2>

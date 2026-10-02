@@ -7,6 +7,7 @@ import AppButton from '../../../components/common/AppButton.vue';
 import Icon from '../../../components/common/Icon.vue';
 import SocialIcon from '../../../components/common/SocialIcon.vue';
 import FormField from '../../../components/form/FormField.vue';
+import ImageUpload from '../../../components/form/ImageUpload.vue';
 import SelectInput from '../../../components/form/SelectInput.vue';
 import TextareaInput from '../../../components/form/TextareaInput.vue';
 import TextInput from '../../../components/form/TextInput.vue';
@@ -15,6 +16,7 @@ import { useTranslations } from '../../../composables/useTranslations';
 
 const props = defineProps({
     settings: { type: Object, required: true },
+    branding: { type: Object, required: true },
     fonts: { type: Array, required: true },
 });
 
@@ -22,25 +24,37 @@ const { t } = useTranslations();
 const locales = usePage().props.locale.supported;
 
 const tabs = [
+    { key: 'branding', label: 'Logo & icon' },
     { key: 'contact', label: 'Contact details' },
     { key: 'social', label: 'Social media' },
     { key: 'seo', label: 'Search engines' },
     { key: 'site', label: 'Website' },
 ];
-const activeTab = ref('contact');
+const activeTab = ref('branding');
 
-const form = useForm(JSON.parse(JSON.stringify(props.settings)));
+const brandingFields = ['logo', 'logo_light', 'favicon'];
+
+const form = useForm({
+    ...JSON.parse(JSON.stringify(props.settings)),
+    ...Object.fromEntries(brandingFields.flatMap((field) => [[field, null], [`remove_${field}`, false]])),
+});
 
 const networks = ['facebook', 'instagram', 'youtube', 'tiktok', 'linkedin', 'x'];
 const localeOptions = locales.map(({ code, native }) => ({ value: code, label: native }));
 
-const tabsWithErrors = computed(() => new Set(Object.keys(form.errors).map((key) => key.split('.')[0])));
+const tabsWithErrors = computed(
+    () => new Set(Object.keys(form.errors).map((key) => (brandingFields.includes(key) ? 'branding' : key.split('.')[0]))),
+);
 
 function submit() {
-    form.put(route('admin.settings.update'), {
+    form.transform((data) => ({ ...data, _method: 'put' })).post(route('admin.settings.update'), {
+        forceFormData: true,
         preserveScroll: true,
-        // Apply the chosen font right away; other pages pick it up on their next load.
-        onSuccess: () => document.documentElement.style.setProperty('--font-site', `var(--font-${form.site.font})`),
+        onSuccess: () => {
+            form.reset(...brandingFields, ...brandingFields.map((field) => `remove_${field}`));
+            // Apply the chosen font right away; other pages pick it up on their next load.
+            document.documentElement.style.setProperty('--font-site', `var(--font-${form.site.font})`);
+        },
     });
 }
 </script>
@@ -68,6 +82,56 @@ function submit() {
                 </button>
             </div>
         </div>
+
+        <section v-show="activeTab === 'branding'" class="grid gap-6 md:grid-cols-3">
+            <div class="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5">
+                <div>
+                    <h2 class="text-sm font-semibold text-ink">{{ t('Logo') }}</h2>
+                    <p class="mt-1 text-xs text-muted">{{ t('Shown in the header on light backgrounds.') }}</p>
+                </div>
+                <ImageUpload
+                    v-model="form.logo"
+                    v-model:removed="form.remove_logo"
+                    :current="branding.logo"
+                    :error="form.errors.logo"
+                    accept="image/png,image/webp"
+                    contain
+                    :hint="t('A PNG or WebP with a transparent background, at least 120 × 40 pixels.')"
+                />
+            </div>
+
+            <div class="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5">
+                <div>
+                    <h2 class="text-sm font-semibold text-ink">{{ t('Logo for dark backgrounds') }}</h2>
+                    <p class="mt-1 text-xs text-muted">{{ t('Optional. Used over the home slider, in the footer and in the control panel. Without it, a transparent main logo is shown in white and any other logo is shown as it is.') }}</p>
+                </div>
+                <ImageUpload
+                    v-model="form.logo_light"
+                    v-model:removed="form.remove_logo_light"
+                    :current="branding.logo_light"
+                    :error="form.errors.logo_light"
+                    accept="image/png,image/webp"
+                    contain
+                    dark
+                />
+            </div>
+
+            <div class="flex flex-col gap-3 rounded-2xl border border-line bg-white p-5">
+                <div>
+                    <h2 class="text-sm font-semibold text-ink">{{ t('Browser icon (favicon)') }}</h2>
+                    <p class="mt-1 text-xs text-muted">{{ t('Shown in the browser tab and bookmarks.') }}</p>
+                </div>
+                <ImageUpload
+                    v-model="form.favicon"
+                    v-model:removed="form.remove_favicon"
+                    :current="branding.favicon"
+                    :error="form.errors.favicon"
+                    accept="image/png"
+                    contain
+                    :hint="t('A square PNG, at least 48 × 48 pixels.')"
+                />
+            </div>
+        </section>
 
         <section v-show="activeTab === 'contact'" class="flex flex-col gap-6 rounded-2xl border border-line bg-white p-5 sm:p-6">
             <div class="grid gap-5 sm:grid-cols-2">

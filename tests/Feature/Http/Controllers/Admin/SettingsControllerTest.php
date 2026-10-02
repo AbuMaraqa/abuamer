@@ -2,11 +2,15 @@
 
 use App\Enums\Role;
 use App\Enums\SiteFont;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Models\Company;
 use App\Models\User;
 use App\Settings\ContactSettings;
 use App\Settings\SiteSettings;
 use App\Settings\SocialSettings;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @param  array<string, mixed>  $overrides
@@ -68,6 +72,72 @@ it('rejects invalid contact values', function (array $override, string $field) {
     'unsupported language' => [['site' => ['default_locale' => 'fr']], 'site.default_locale'],
     'unknown font' => [['site' => ['font' => 'comic-sans']], 'site.font'],
 ]);
+
+it('stores the logo, the light logo and the browser icon', function () {
+    Storage::fake('public');
+
+    // Sent the way the browser form sends it: multipart POST with a spoofed PUT method.
+    $response = $this->actingAs(admin())->post(route('admin.settings.update'), settingsPayload([
+        '_method' => 'PUT',
+        'logo' => UploadedFile::fake()->image('logo.png', 400, 120),
+        'logo_light' => UploadedFile::fake()->image('logo-white.png', 400, 120),
+        'favicon' => UploadedFile::fake()->image('icon.png', 64, 64),
+    ]));
+
+    $response->assertSessionHasNoErrors();
+
+    $company = Company::current();
+    expect($company->getFirstMedia(Company::LOGO_COLLECTION)->file_name)->toBe('logo.png')
+        ->and($company->getFirstMedia(Company::LOGO_LIGHT_COLLECTION)->file_name)->toBe('logo-white.png')
+        ->and($company->getFirstMedia(Company::FAVICON_COLLECTION)->file_name)->toBe('icon.png');
+});
+
+it('refuses an SVG logo', function () {
+    Storage::fake('public');
+    $svg = UploadedFile::fake()->createWithContent('logo.svg', '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>');
+
+    $response = $this->actingAs(admin())->put(route('admin.settings.update'), settingsPayload(['logo' => $svg]));
+
+    $response->assertSessionHasErrors('logo');
+    expect(Company::current()->getFirstMedia(Company::LOGO_COLLECTION))->toBeNull();
+});
+
+it('refuses a browser icon that is not square', function () {
+    Storage::fake('public');
+
+    $response = $this->actingAs(admin())->put(route('admin.settings.update'), settingsPayload([
+        'favicon' => UploadedFile::fake()->image('icon.png', 120, 60),
+    ]));
+
+    $response->assertSessionHasErrors('favicon');
+});
+
+it('removes the logo when requested', function () {
+    Storage::fake('public');
+    Company::current()->addMedia(UploadedFile::fake()->image('logo.png', 400, 120))->toMediaCollection(Company::LOGO_COLLECTION);
+
+    $this->actingAs(admin())->put(route('admin.settings.update'), settingsPayload(['remove_logo' => true]));
+
+    expect(Company::current()->getFirstMedia(Company::LOGO_COLLECTION))->toBeNull();
+});
+
+it('resends the site identity after saving, although the browser already has it', function () {
+    Storage::fake('public');
+    $admin = admin();
+
+    $response = $this->actingAs($admin)
+        ->followingRedirects()
+        ->withHeaders([
+            'X-Inertia' => 'true',
+            'X-Inertia-Version' => (string) app(HandleInertiaRequests::class)->version(request()),
+            'X-Inertia-Except-Once-Props' => 'site',
+        ])
+        ->put(route('admin.settings.update'), settingsPayload([
+            'logo' => UploadedFile::fake()->image('logo.png', 400, 120),
+        ]));
+
+    expect($response->json('props.site.logo'))->toEndWith('logo.png');
+});
 
 it('forbids editors from changing settings', function () {
     test()->seed(RolesAndPermissionsSeeder::class);
