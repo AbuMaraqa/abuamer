@@ -40,8 +40,8 @@ onBeforeUnmount(removeNavigateListener);
         </Transition>
 
         <aside
-            class="fixed inset-y-0 start-0 z-40 flex w-72 flex-col bg-ink text-sand-200 transition-transform duration-300 ease-elegant lg:sticky lg:top-0 lg:h-svh lg:translate-x-0"
-            :class="isSidebarOpen ? 'translate-x-0' : 'ltr:-translate-x-full rtl:translate-x-full'"
+            class="fixed inset-y-0 start-0 z-40 flex w-72 shrink-0 flex-col bg-ink text-sand-200 transition-transform duration-300 ease-elegant lg:sticky lg:top-0 lg:h-svh"
+            :class="{ 'max-lg:ltr:-translate-x-full max-lg:rtl:translate-x-full': !isSidebarOpen }"
         >
             <div class="flex items-center justify-between px-6 py-6">
                 <Link :href="route('admin.dashboard')" class="font-display text-2xl text-white">{{ $page.props.appName }}</Link>

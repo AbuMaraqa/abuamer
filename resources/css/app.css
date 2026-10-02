@@ -5,11 +5,12 @@
 
 /*
  * Nasaq design tokens: warm stone neutrals with a brass accent.
- * Font families are self-hosted by the Vite fonts plugin (see vite.config.js),
- * which exposes them as --font-body, --font-display-latin and --font-display-arabic.
+ * Font families are self-hosted by the Vite fonts plugin (see vite.config.js), which
+ * exposes them as --font-{alias}. The root view sets --font-site to the body font
+ * chosen in the control panel (App\Enums\SiteFont).
  */
 @theme {
-    --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    --font-sans: var(--font-site, var(--font-ibm-plex-sans-arabic)), ui-sans-serif, system-ui, sans-serif;
     --font-display: var(--font-display-latin), var(--font-display-arabic), ui-serif, Georgia, serif;
 
     --color-ink: #1d1b18;
@@ -44,6 +45,8 @@
 
     body {
         @apply bg-sand-50 font-sans text-ink;
+        /* The display face defaults to old-style figures ("0" looks like "o"); sizes like 60×120 need lining figures. */
+        font-variant-numeric: lining-nums;
     }
 
     /* Arabic script connects its letters, so tracking must never be applied to it. */

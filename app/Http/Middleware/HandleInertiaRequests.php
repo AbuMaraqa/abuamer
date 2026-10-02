@@ -9,6 +9,7 @@ use App\Models\ContactMessage;
 use App\Models\User;
 use App\Services\Catalog\CategoryTreeService;
 use App\Settings\ContactSettings;
+use App\Settings\SiteSettings;
 use App\Settings\SocialSettings;
 use App\Support\Localized;
 use App\Support\Seo\SeoMeta;
@@ -93,6 +94,7 @@ class HandleInertiaRequests extends Middleware
             'tagline' => $company->tagline,
             'logo' => $company->getFirstMediaUrl(Company::LOGO_COLLECTION) ?: null,
             'favicon' => $company->getFirstMediaUrl(Company::FAVICON_COLLECTION) ?: null,
+            'font' => app(SiteSettings::class)->font()->value,
             'contact' => [
                 'phone' => $contact->phone ?: null,
                 'mobile' => $contact->mobile ?: null,

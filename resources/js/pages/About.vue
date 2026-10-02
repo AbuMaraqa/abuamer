@@ -54,7 +54,7 @@ const lightboxIndex = ref(null);
         <SectionHeading :eyebrow="t('Our values')" :title="t('What guides our work')" />
         <ol class="mt-12 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="(value, index) in values" :key="value.id" class="flex flex-col gap-3 border-t border-line pt-6">
-                <span class="font-display text-lg text-brass-600 tabular-nums" dir="ltr">{{ String(index + 1).padStart(2, '0') }}</span>
+                <span class="font-display text-lg text-brass-600 tabular-nums lining-nums" dir="ltr">{{ String(index + 1).padStart(2, '0') }}</span>
                 <h3 class="font-display text-2xl text-ink">{{ value.title }}</h3>
                 <p v-if="value.description" class="text-sm leading-relaxed text-muted">{{ value.description }}</p>
             </li>

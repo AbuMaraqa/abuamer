@@ -15,6 +15,7 @@ import { useTranslations } from '../../../composables/useTranslations';
 
 const props = defineProps({
     settings: { type: Object, required: true },
+    fonts: { type: Array, required: true },
 });
 
 const { t } = useTranslations();
@@ -36,7 +37,11 @@ const localeOptions = locales.map(({ code, native }) => ({ value: code, label: n
 const tabsWithErrors = computed(() => new Set(Object.keys(form.errors).map((key) => key.split('.')[0])));
 
 function submit() {
-    form.put(route('admin.settings.update'), { preserveScroll: true });
+    form.put(route('admin.settings.update'), {
+        preserveScroll: true,
+        // Apply the chosen font right away; other pages pick it up on their next load.
+        onSuccess: () => document.documentElement.style.setProperty('--font-site', `var(--font-${form.site.font})`),
+    });
 }
 </script>
 
@@ -133,6 +138,30 @@ function submit() {
         </section>
 
         <section v-show="activeTab === 'site'" class="flex flex-col gap-6 rounded-2xl border border-line bg-white p-5 sm:p-6">
+            <fieldset class="flex flex-col gap-3">
+                <legend class="mb-1 text-sm font-medium text-ink-soft">{{ t('Website font') }}</legend>
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <label
+                        v-for="font in fonts"
+                        :key="font.value"
+                        class="flex cursor-pointer flex-col gap-3 rounded-xl border-2 p-4 transition-colors"
+                        :class="form.site.font === font.value ? 'border-brass-500 bg-brass-300/10' : 'border-line hover:border-sand-400'"
+                    >
+                        <span class="flex items-center justify-between gap-3">
+                            <span class="text-sm font-medium text-ink" dir="ltr">{{ font.label }}</span>
+                            <input v-model="form.site.font" type="radio" name="font" :value="font.value" class="size-4 accent-brass-500" />
+                        </span>
+                        <span class="flex flex-col gap-1 text-ink" :style="{ fontFamily: `var(--font-${font.value})` }">
+                            <span class="text-xl" dir="rtl" lang="ar">نُسق للبلاط والسيراميك</span>
+                            <span class="text-sm text-muted" dir="rtl" lang="ar">بلاط فاخر لمساحات استثنائية — 60 × 120 سم</span>
+                            <span class="text-sm text-muted" dir="ltr" lang="en">Premium tiles for exceptional spaces</span>
+                        </span>
+                    </label>
+                </div>
+                <p v-if="form.errors['site.font']" class="text-sm text-danger">{{ form.errors['site.font'] }}</p>
+                <p v-else class="text-xs text-muted">{{ t('Used for the text of the website and the control panel. Headings keep their display font.') }}</p>
+            </fieldset>
+
             <FormField :label="t('Default language')" for="default-locale" :error="form.errors['site.default_locale']" :hint="t('The language visitors see when they open the website address without a language.')">
                 <SelectInput id="default-locale" v-model="form.site.default_locale" :options="localeOptions" class="sm:max-w-xs" />
             </FormField>

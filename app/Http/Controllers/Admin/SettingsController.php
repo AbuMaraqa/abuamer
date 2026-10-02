@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\Permission;
+use App\Enums\SiteFont;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateSettingsRequest;
 use App\Settings\ContactSettings;
@@ -27,6 +28,10 @@ class SettingsController extends Controller
                 'seo' => $seo->toArray(),
                 'site' => $site->toArray(),
             ],
+            'fonts' => array_map(
+                fn (SiteFont $font): array => ['value' => $font->value, 'label' => $font->label()],
+                SiteFont::cases(),
+            ),
         ]);
     }
 
@@ -38,6 +43,7 @@ class SettingsController extends Controller
         $site->fill([
             'default_locale' => $request->validated('site.default_locale'),
             'maintenance_mode' => $request->boolean('site.maintenance_mode'),
+            'font' => $request->validated('site.font'),
         ])->save();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Settings saved.')]);

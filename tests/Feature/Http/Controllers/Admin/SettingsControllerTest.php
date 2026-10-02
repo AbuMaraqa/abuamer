@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Role;
+use App\Enums\SiteFont;
 use App\Models\User;
 use App\Settings\ContactSettings;
 use App\Settings\SiteSettings;
@@ -31,7 +32,7 @@ function settingsPayload(array $overrides = []): array
             'meta_description' => ['ar' => '', 'en' => ''],
             'meta_keywords' => ['ar' => '', 'en' => ''],
         ],
-        'site' => ['default_locale' => 'en', 'maintenance_mode' => false],
+        'site' => ['default_locale' => 'en', 'maintenance_mode' => false, 'font' => 'tajawal'],
     ], $overrides);
 }
 
@@ -44,7 +45,16 @@ it('saves every settings group, keeping empty fields as empty text', function ()
         ->and($contact->mobile)->toBe('')
         ->and($contact->address)->toBe(['ar' => 'الرياض', 'en' => 'Riyadh'])
         ->and(app(SocialSettings::class)->links())->toBe(['instagram' => 'https://instagram.com/nasaq'])
-        ->and(app(SiteSettings::class)->default_locale)->toBe('en');
+        ->and(app(SiteSettings::class)->default_locale)->toBe('en')
+        ->and(app(SiteSettings::class)->font())->toBe(SiteFont::Tajawal);
+});
+
+it('uses the chosen font on the website', function () {
+    app(SiteSettings::class)->fill(['font' => SiteFont::Tajawal->value])->save();
+
+    $response = $this->get(route('home'));
+
+    $response->assertSee('style="--font-site: var(--font-tajawal)"', escape: false);
 });
 
 it('rejects invalid contact values', function (array $override, string $field) {
@@ -56,6 +66,7 @@ it('rejects invalid contact values', function (array $override, string $field) {
     'map embed from another site' => [['contact' => ['map_embed_url' => 'https://evil.example/embed']], 'contact.map_embed_url'],
     'insecure social link' => [['social' => ['facebook' => 'http://facebook.com/nasaq']], 'social.facebook'],
     'unsupported language' => [['site' => ['default_locale' => 'fr']], 'site.default_locale'],
+    'unknown font' => [['site' => ['font' => 'comic-sans']], 'site.font'],
 ]);
 
 it('forbids editors from changing settings', function () {

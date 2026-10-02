@@ -2,6 +2,7 @@
 
 namespace App\Settings;
 
+use App\Enums\SiteFont;
 use Spatie\LaravelSettings\Settings;
 
 class SiteSettings extends Settings
@@ -16,8 +17,18 @@ class SiteSettings extends Settings
      */
     public bool $maintenance_mode;
 
+    /**
+     * The body font of the website (a SiteFont value).
+     */
+    public string $font;
+
     public static function group(): string
     {
         return 'site';
+    }
+
+    public function font(): SiteFont
+    {
+        return SiteFont::tryFrom($this->font) ?? SiteFont::IbmPlexSansArabic;
     }
 }

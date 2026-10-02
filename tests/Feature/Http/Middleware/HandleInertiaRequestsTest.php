@@ -32,7 +32,7 @@ it('shares the English locale with a left-to-right direction', function () {
 it('renders the document with the locale language and direction', function () {
     $response = $this->get(route('home'));
 
-    $response->assertSee('<html lang="ar" dir="rtl">', escape: false);
+    $response->assertSeeInOrder(['<html', 'lang="ar"', 'dir="rtl"', '<head>'], escape: false);
 });
 
 it('shares the permissions an editor holds', function () {

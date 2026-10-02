@@ -46,7 +46,7 @@ const shortcuts = computed(() =>
         >
             <div>
                 <p class="text-sm text-muted">{{ card.label }}</p>
-                <p class="mt-2 font-display text-4xl text-ink tabular-nums">{{ card.value }}</p>
+                <p class="mt-2 font-display text-4xl text-ink tabular-nums lining-nums">{{ card.value }}</p>
             </div>
             <span class="flex size-12 items-center justify-center rounded-full bg-sand-100 text-brass-700">
                 <Icon :name="card.icon" :size="22" />

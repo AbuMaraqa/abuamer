@@ -30,7 +30,7 @@ const content = computed(() => messages[props.status] ?? messages[500]);
     <Head :title="t(content[0])" />
 
     <main class="flex min-h-svh flex-col items-center justify-center gap-6 bg-sand-50 px-6 text-center">
-        <p class="font-display text-8xl text-brass-500 tabular-nums" dir="ltr">{{ status }}</p>
+        <p class="font-display text-8xl text-brass-500 tabular-nums lining-nums" dir="ltr">{{ status }}</p>
         <h1 class="font-display text-4xl text-ink sm:text-5xl">{{ t(content[0]) }}</h1>
         <p class="max-w-md text-base leading-relaxed text-muted">{{ t(content[1]) }}</p>
         <a :href="homeUrl" class="mt-2 rounded-lg bg-ink px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-ink-soft">

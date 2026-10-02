@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Enums\Permission;
+use App\Enums\SiteFont;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -46,6 +47,7 @@ class UpdateSettingsRequest extends FormRequest
 
             'site.default_locale' => ['required', Rule::in(config('translatable.locales'))],
             'site.maintenance_mode' => ['required', 'boolean'],
+            'site.font' => ['required', Rule::enum(SiteFont::class)],
         ];
 
         foreach (config('translatable.locales') as $locale) {

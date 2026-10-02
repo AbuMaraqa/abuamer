@@ -66,7 +66,7 @@ const { t } = useTranslations();
             </div>
             <div v-if="company.founded_year" class="absolute start-6 bottom-6 rounded-xl bg-white/95 px-5 py-4 shadow-xl shadow-ink/10 backdrop-blur">
                 <p class="text-xs text-muted">{{ t('Since') }}</p>
-                <p class="font-display text-3xl text-ink tabular-nums">{{ company.founded_year }}</p>
+                <p class="font-display text-3xl text-ink tabular-nums lining-nums">{{ company.founded_year }}</p>
             </div>
         </div>
 

@@ -11,10 +11,17 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
             fonts: [
-                // Body text for both languages (the family ships Arabic and Latin glyphs).
+                // Body fonts, selectable in the control panel (App\Enums\SiteFont); the alias is the enum value.
+                // Both families ship Arabic and Latin glyphs.
                 bunny('IBM Plex Sans Arabic', {
-                    alias: 'body',
+                    alias: 'ibm-plex-sans-arabic',
                     weights: [300, 400, 500, 600, 700],
+                    subsets: ['arabic', 'latin'],
+                    preload: [{ weight: 400 }],
+                }),
+                bunny('Tajawal', {
+                    alias: 'tajawal',
+                    weights: [300, 400, 500, 700],
                     subsets: ['arabic', 'latin'],
                     preload: [{ weight: 400 }],
                 }),
