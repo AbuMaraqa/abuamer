@@ -1,5 +1,6 @@
 <script setup>
-import { nextTick, onBeforeUnmount, ref, useId, watch } from 'vue';
+import { onBeforeUnmount, ref, useId, watch } from 'vue';
+import { useFocusTrap } from '../../composables/useFocusTrap';
 import Icon from './Icon.vue';
 
 const props = defineProps({
@@ -32,7 +33,7 @@ function release() {
 
 watch(
     () => props.show,
-    async (show) => {
+    (show) => {
         if (!show) {
             release();
 
@@ -41,11 +42,12 @@ watch(
 
         document.addEventListener('keydown', onKeydown);
         document.body.style.overflow = 'hidden';
-
-        await nextTick();
-        panel.value?.querySelector('[autofocus], input, select, textarea, button:not([data-dialog-close])')?.focus();
     },
 );
+
+useFocusTrap(panel, () => props.show, {
+    initialFocus: () => panel.value?.querySelector('[autofocus], input, select, textarea, button:not([data-dialog-close])'),
+});
 
 onBeforeUnmount(release);
 </script>
@@ -71,7 +73,13 @@ onBeforeUnmount(release);
                 >
                     <header class="flex items-center justify-between gap-4 border-b border-line px-6 py-4">
                         <h2 :id="titleId" class="font-display text-xl text-ink">{{ title }}</h2>
-                        <button type="button" data-dialog-close class="text-muted transition-colors hover:text-ink" :aria-label="$t('Close')" @click="emit('close')">
+                        <button
+                            type="button"
+                            data-dialog-close
+                            class="-me-2 flex size-10 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-sand-100 hover:text-ink"
+                            :aria-label="$t('Close')"
+                            @click="emit('close')"
+                        >
                             <Icon name="x" />
                         </button>
                     </header>

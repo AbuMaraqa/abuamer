@@ -5,20 +5,27 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreContactMessageRequest;
 use App\Mail\ContactMessageReceived;
 use App\Models\ContactMessage;
+use App\Models\Product;
+use App\Services\Catalog\CategoryTreeService;
 use App\Settings\ContactSettings;
 use App\Support\Localized;
 use App\Support\Seo\SeoMeta;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ContactController extends Controller
 {
+    public function __construct(private readonly CategoryTreeService $categoryTree) {}
+
     /**
-     * Show the contact page.
+     * Show the contact page. Visitors coming from a product page ("?product=12") find the
+     * subject already filled in with that product.
      */
-    public function show(ContactSettings $contact): Response
+    public function show(Request $request, ContactSettings $contact): Response
     {
         return Inertia::render('Contact', [
             'seo' => SeoMeta::make()
@@ -26,6 +33,7 @@ class ContactController extends Controller
                 ->description(__('Our team will help you choose the right tiles, sizes and finishes for your space.')),
             'mapEmbedUrl' => $contact->map_embed_url ?: null,
             'workingHours' => Localized::value($contact->working_hours) ?: null,
+            'subject' => $this->productInquirySubject($request->integer('product')),
         ]);
     }
 
@@ -50,5 +58,21 @@ class ContactController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Thank you! Your message has been sent. We will get back to you soon.')]);
 
         return back();
+    }
+
+    /**
+     * The subject for an inquiry about a product the visitor can see, e.g. "Inquiry about Calacatta Gold (NSQ-000012)".
+     */
+    private function productInquirySubject(int $productId): ?string
+    {
+        $product = $productId > 0 ? Product::query()->active()->find($productId) : null;
+
+        if ($product === null || ! $this->categoryTree->tree()->isVisible($product->category_id)) {
+            return null;
+        }
+
+        $subject = __('Inquiry about :name', ['name' => $product->name]).($product->sku ? " ({$product->sku})" : '');
+
+        return Str::limit($subject, 200, '');
     }
 }

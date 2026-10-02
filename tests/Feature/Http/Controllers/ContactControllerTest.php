@@ -1,7 +1,9 @@
 <?php
 
 use App\Mail\ContactMessageReceived;
+use App\Models\Category;
 use App\Models\ContactMessage;
+use App\Models\Product;
 use App\Settings\ContactSettings;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -25,8 +27,25 @@ function contactPayload(array $overrides = []): array
 it('renders the contact page', function () {
     $response = $this->get(route('contact'));
 
-    $response->assertInertia(fn (Assert $page) => $page->component('Contact'));
+    $response->assertInertia(fn (Assert $page) => $page->component('Contact')->where('subject', null));
 });
+
+it('fills in the subject for an inquiry about a product', function () {
+    $product = Product::factory()->named('Calacatta Gold', 'كالاكاتا ذهبي')->create(['sku' => 'NSQ-000012']);
+
+    $response = $this->get(route('contact', ['product' => $product->id]));
+
+    $response->assertInertia(fn (Assert $page) => $page->where('subject', 'استفسار عن كالاكاتا ذهبي (NSQ-000012)'));
+});
+
+it('leaves the subject empty for products visitors cannot see', function (Product $product) {
+    $response = $this->get(route('contact', ['product' => $product->id]));
+
+    $response->assertInertia(fn (Assert $page) => $page->where('subject', null));
+})->with([
+    'hidden product' => fn () => Product::factory()->inactive()->create(),
+    'product in a hidden category' => fn () => Product::factory()->for(Category::factory()->inactive())->create(),
+]);
 
 it('stores the message and emails the configured recipient', function () {
     Mail::fake();

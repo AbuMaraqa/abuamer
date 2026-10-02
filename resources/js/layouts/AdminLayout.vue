@@ -2,6 +2,7 @@
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { route } from 'ziggy-js';
+import { useFocusTrap } from '../composables/useFocusTrap';
 import FlashToaster from '../components/common/FlashToaster.vue';
 import Icon from '../components/common/Icon.vue';
 import LanguageSwitcher from '../components/common/LanguageSwitcher.vue';
@@ -9,6 +10,7 @@ import SiteLogo from '../components/layout/SiteLogo.vue';
 
 const page = usePage();
 const isSidebarOpen = ref(false);
+const sidebar = ref(null);
 
 /**
  * Items whose route is not registered yet, or that the user may not access, are hidden.
@@ -32,6 +34,9 @@ const removeNavigateListener = router.on('navigate', () => {
 });
 
 onBeforeUnmount(removeNavigateListener);
+
+// The sidebar only opens as a drawer on small screens.
+useFocusTrap(sidebar, () => isSidebarOpen.value);
 </script>
 
 <template>
@@ -41,13 +46,17 @@ onBeforeUnmount(removeNavigateListener);
             <div v-if="isSidebarOpen" class="fixed inset-0 z-30 bg-ink/40 lg:hidden" @click="isSidebarOpen = false" />
         </Transition>
 
+        <!-- When closed on small screens it is also invisible, so Tab skips its links. Closing
+             delays the visibility change until the slide-out ends; opening shows it at once. -->
         <aside
-            class="fixed inset-y-0 start-0 z-40 flex w-72 shrink-0 flex-col bg-ink text-sand-200 transition-transform duration-300 ease-elegant lg:sticky lg:top-0 lg:h-svh"
-            :class="{ 'max-lg:ltr:-translate-x-full max-lg:rtl:translate-x-full': !isSidebarOpen }"
+            ref="sidebar"
+            class="fixed inset-y-0 start-0 z-40 flex w-72 shrink-0 flex-col bg-ink text-sand-200 transition-[translate] duration-300 ease-elegant lg:sticky lg:top-0 lg:h-svh"
+            :class="{ 'max-lg:invisible max-lg:transition-[translate,visibility] max-lg:ltr:-translate-x-full max-lg:rtl:translate-x-full': !isSidebarOpen }"
+            @keydown.esc="isSidebarOpen = false"
         >
             <div class="flex items-center justify-between px-6 py-6">
                 <SiteLogo :href="route('admin.dashboard')" inverted size="sm" />
-                <button type="button" class="text-sand-300 hover:text-white lg:hidden" :aria-label="$t('Close menu')" @click="isSidebarOpen = false">
+                <button type="button" class="-me-2 flex size-10 items-center justify-center rounded-lg text-sand-300 transition-colors hover:bg-white/5 hover:text-white lg:hidden" :aria-label="$t('Close menu')" @click="isSidebarOpen = false">
                     <Icon name="x" />
                 </button>
             </div>
@@ -79,7 +88,7 @@ onBeforeUnmount(removeNavigateListener);
 
         <div class="flex min-w-0 grow flex-col">
             <header class="sticky top-0 z-20 flex items-center gap-4 border-b border-line bg-white/90 px-4 py-3 backdrop-blur sm:px-6">
-                <button type="button" class="text-ink lg:hidden" :aria-label="$t('Open menu')" @click="isSidebarOpen = true">
+                <button type="button" class="-ms-2 flex size-10 items-center justify-center rounded-lg text-ink transition-colors hover:bg-sand-100 lg:hidden" :aria-label="$t('Open menu')" :aria-expanded="isSidebarOpen" @click="isSidebarOpen = true">
                     <Icon name="menu" />
                 </button>
 

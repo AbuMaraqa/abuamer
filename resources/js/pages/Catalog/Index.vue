@@ -39,7 +39,7 @@ const { t } = useTranslations();
             <div class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <h2 class="font-display text-3xl text-ink sm:text-4xl">{{ t('All products') }}</h2>
-                    <p class="mt-2 text-sm text-muted">{{ t(':count products', { count: products.meta.total }) }}</p>
+                    <p class="mt-2 text-sm text-muted" aria-live="polite">{{ t(':count products', { count: products.meta.total }) }}</p>
                 </div>
                 <ProductFilters :filters="filters" :url="route('products.index')" />
             </div>

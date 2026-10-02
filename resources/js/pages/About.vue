@@ -82,7 +82,7 @@ const lightboxIndex = ref(null);
                 :aria-label="t('Show image :number', { number: index + 1 })"
                 @click="lightboxIndex = index"
             >
-                <img :src="image.large" alt="" loading="lazy" class="w-full transition-transform duration-700 ease-elegant hover:scale-105" />
+                <img :src="image.large" alt="" loading="lazy" class="w-full transition-transform duration-700 ease-elegant motion-safe:hover:scale-105" />
             </button>
         </div>
         <ImageLightbox v-model="lightboxIndex" :images="company.gallery" :alt="company.name" />

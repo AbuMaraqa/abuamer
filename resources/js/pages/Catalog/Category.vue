@@ -22,7 +22,7 @@ const { t } = useTranslations();
 <template>
     <section class="relative overflow-hidden bg-ink text-white">
         <img v-if="category.image" :src="category.image.large" alt="" class="absolute inset-0 h-full w-full object-cover opacity-45" />
-        <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/10" />
+        <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/10" aria-hidden="true" />
 
         <div class="relative mx-auto flex min-h-[22rem] max-w-7xl flex-col justify-end gap-6 px-4 pt-24 pb-12 sm:px-6 lg:min-h-[28rem] lg:px-8">
             <AppBreadcrumbs :items="breadcrumbs" class="[&_a]:text-white/70 [&_a:hover]:text-white [&_span]:text-white [&_svg]:text-white/40" />
@@ -45,7 +45,7 @@ const { t } = useTranslations();
             <div class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <h2 class="font-display text-3xl text-ink">{{ t('Products') }}</h2>
-                    <p class="mt-2 text-sm text-muted">{{ t(':count products', { count: products.meta.total }) }}</p>
+                    <p class="mt-2 text-sm text-muted" aria-live="polite">{{ t(':count products', { count: products.meta.total }) }}</p>
                 </div>
                 <ProductFilters :filters="filters" :url="category.url" />
             </div>

@@ -1,6 +1,6 @@
 <script setup>
 import { useForm, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { route } from 'ziggy-js';
 import AppButton from '../components/common/AppButton.vue';
 import Icon from '../components/common/Icon.vue';
@@ -10,19 +10,22 @@ import TextareaInput from '../components/form/TextareaInput.vue';
 import TextInput from '../components/form/TextInput.vue';
 import { useTranslations } from '../composables/useTranslations';
 
-defineProps({
+const props = defineProps({
     mapEmbedUrl: { type: String, default: null },
     workingHours: { type: String, default: null },
+    // Filled in when the visitor comes from a product's "Request a quote" button.
+    subject: { type: String, default: null },
 });
 
 const { t } = useTranslations();
 const contact = usePage().props.site.contact;
+const formElement = ref(null);
 
 const form = useForm({
     name: '',
     email: '',
     phone: '',
-    subject: '',
+    subject: props.subject ?? '',
     message: '',
     website: '',
 });
@@ -40,6 +43,8 @@ function submit() {
     form.post(route('contact.store'), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
+        // Take the visitor (and screen readers) straight to the first field to fix.
+        onError: () => nextTick(() => formElement.value?.querySelector('[aria-invalid="true"]')?.focus()),
     });
 }
 </script>
@@ -105,7 +110,7 @@ function submit() {
             </div>
         </div>
 
-        <form class="flex flex-col gap-5 rounded-2xl border border-line bg-white p-6 sm:p-8 lg:col-span-3" novalidate @submit.prevent="submit">
+        <form ref="formElement" class="flex flex-col gap-5 rounded-2xl border border-line bg-white p-6 sm:p-8 lg:col-span-3" novalidate @submit.prevent="submit">
             <h2 class="font-display text-2xl text-ink">{{ t('Send us a message') }}</h2>
 
             <div class="grid gap-5 sm:grid-cols-2">

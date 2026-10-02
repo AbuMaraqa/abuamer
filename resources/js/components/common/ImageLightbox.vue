@@ -1,10 +1,13 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
-import { computed, onBeforeUnmount, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { useFocusTrap } from '../../composables/useFocusTrap';
 import Icon from './Icon.vue';
 
 /**
  * Full-screen image viewer. v-model holds the open index (null when closed).
+ * Shows the "large" conversion (up to 1800px), which is sharp full screen yet far
+ * lighter than the original upload.
  */
 const props = defineProps({
     images: { type: Array, required: true },
@@ -44,15 +47,19 @@ onBeforeUnmount(() => {
     document.removeEventListener('keydown', onKeydown);
     document.body.style.overflow = '';
 });
+
+const dialog = ref(null);
+
+useFocusTrap(dialog, () => index.value !== null);
 </script>
 
 <template>
     <Teleport to="body">
         <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-150" leave-to-class="opacity-0">
-            <div v-if="current" class="fixed inset-0 z-50 flex items-center justify-center bg-ink/95 p-4 sm:p-10" role="dialog" aria-modal="true" :aria-label="alt">
-                <img :src="current.url" :alt="alt" class="max-h-full max-w-full rounded-lg object-contain" />
+            <div v-if="current" ref="dialog" class="fixed inset-0 z-50 flex items-center justify-center bg-ink/95 p-4 sm:p-10" role="dialog" aria-modal="true" :aria-label="alt" @click.self="index = null">
+                <img :src="current.large ?? current.url" :alt="alt" class="max-h-full max-w-full rounded-lg object-contain" />
 
-                <button type="button" class="absolute end-4 top-4 flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20" :aria-label="$t('Close')" @click="index = null">
+                <button type="button" class="absolute end-4 top-4 flex size-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20" :aria-label="$t('Close')" @click="index = null">
                     <Icon name="x" />
                 </button>
 

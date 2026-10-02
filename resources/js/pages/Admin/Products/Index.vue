@@ -133,7 +133,7 @@ const deleting = ref(null);
                 type="search"
                 :placeholder="t('Search by name or code…')"
                 :aria-label="t('Search products')"
-                class="w-full rounded-lg border border-line py-2.5 ps-11 pe-3 text-sm placeholder:text-sand-400 focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20 focus:outline-none"
+                class="w-full rounded-lg border border-line py-2.5 ps-11 pe-3 text-sm placeholder:text-muted/80 focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20 focus:outline-none"
             />
         </div>
         <div class="flex flex-col gap-2">
@@ -179,7 +179,7 @@ const deleting = ref(null);
                         <div class="flex items-center gap-3">
                             <div class="size-12 shrink-0 overflow-hidden rounded-lg bg-sand-100">
                                 <img v-if="product.image" :src="product.image.thumb" alt="" class="h-full w-full object-cover" loading="lazy" />
-                                <ImagePlaceholder v-else class="[&_span]:text-base" />
+                                <ImagePlaceholder v-else />
                             </div>
                             <div class="min-w-0">
                                 <Link :href="route('admin.products.edit', product.id)" class="block truncate font-medium text-ink hover:text-brass-700">

@@ -13,9 +13,9 @@ defineProps({
             <img
                 v-if="product.image"
                 :src="product.image.thumb"
-                :alt="product.name"
+                alt=""
                 loading="lazy"
-                class="h-full w-full object-cover transition-transform duration-700 ease-elegant group-hover:scale-105"
+                class="h-full w-full object-cover transition-transform duration-700 ease-elegant motion-safe:group-hover:scale-105"
             />
             <ImagePlaceholder v-else />
             <span v-if="product.featured" class="absolute start-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[11px] font-medium text-brass-700 backdrop-blur">

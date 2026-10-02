@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, ref, useId } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import { useTranslations } from '../../composables/useTranslations';
 import Icon from '../common/Icon.vue';
@@ -16,7 +16,6 @@ const images = defineModel('images', { type: Array, required: true });
 const uploads = defineModel('uploads', { type: Array, required: true });
 
 const { t } = useTranslations();
-const inputId = useId();
 const previews = ref([]);
 
 function addFiles(fileList) {
@@ -76,18 +75,17 @@ onBeforeUnmount(() => previews.value.forEach((url) => URL.revokeObjectURL(url)))
                 </p>
             </figure>
 
+            <!-- The visually hidden input sits inside the label, so the label can show its keyboard focus. -->
             <label
-                :for="inputId"
-                class="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line text-center text-xs text-muted transition-colors hover:border-sand-400"
+                class="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line text-center text-xs text-muted transition-colors hover:border-sand-400 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brass-500"
                 @dragover.prevent
                 @drop.prevent="addFiles($event.dataTransfer?.files)"
             >
                 <Icon name="plus" :size="20" />
                 {{ t('Add images') }}
+                <input type="file" accept="image/jpeg,image/png,image/webp" multiple class="sr-only" @change="addFiles($event.target.files); $event.target.value = ''" />
             </label>
         </div>
-
-        <input :id="inputId" type="file" accept="image/jpeg,image/png,image/webp" multiple class="sr-only" @change="addFiles($event.target.files); $event.target.value = ''" />
         <p class="text-xs text-muted">{{ t('Drag images to reorder. At least 600 × 600 pixels, up to 8 MB each.') }}</p>
         <p v-if="errors.gallery_uploads" class="text-sm text-danger">{{ errors.gallery_uploads }}</p>
     </div>

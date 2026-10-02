@@ -26,7 +26,8 @@ function formatDate(iso) {
         <ul v-if="messages.data.length > 0" class="divide-y divide-line">
             <li v-for="message in messages.data" :key="message.id">
                 <Link :href="route('admin.messages.show', message.id)" class="flex items-start gap-4 px-5 py-4 transition-colors hover:bg-sand-50">
-                    <span class="mt-2 size-2 shrink-0 rounded-full" :class="message.read ? 'bg-transparent' : 'bg-brass-500'" :aria-label="message.read ? undefined : t('Unread')" />
+                    <span class="mt-2 size-2 shrink-0 rounded-full" :class="message.read ? 'bg-transparent' : 'bg-brass-500'" aria-hidden="true" />
+                    <span v-if="!message.read" class="sr-only">{{ t('Unread') }}</span>
                     <div class="min-w-0 grow">
                         <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                             <p class="truncate text-sm" :class="message.read ? 'text-ink-soft' : 'font-semibold text-ink'">{{ message.name }}</p>

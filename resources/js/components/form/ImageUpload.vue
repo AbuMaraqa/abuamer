@@ -68,7 +68,14 @@ onBeforeUnmount(() => previewUrl.value && URL.revokeObjectURL(previewUrl.value))
 
 <template>
     <div class="flex flex-col gap-2">
-        <div v-if="shownImage" class="group relative overflow-hidden rounded-xl border border-line" :class="dark ? 'bg-ink' : 'bg-sand-100'">
+        <!-- Visually hidden; it comes first so the visible frame below can show its keyboard focus (peer-focus-visible). -->
+        <input :id="inputId" type="file" :accept="accept" class="peer sr-only" @change="setFile($event.target.files[0]); $event.target.value = ''" />
+
+        <div
+            v-if="shownImage"
+            class="group relative overflow-hidden rounded-xl border border-line peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brass-500"
+            :class="dark ? 'bg-ink' : 'bg-sand-100'"
+        >
             <img :src="shownImage" alt="" class="aspect-[4/3] w-full" :class="contain ? 'object-contain p-6' : 'object-cover'" />
             <div class="absolute inset-x-0 bottom-0 flex justify-end gap-2 bg-gradient-to-t from-ink/60 to-transparent p-3">
                 <label :for="inputId" class="cursor-pointer rounded-lg bg-white/90 px-3 py-1.5 text-xs font-medium text-ink hover:bg-white">
@@ -83,7 +90,7 @@ onBeforeUnmount(() => previewUrl.value && URL.revokeObjectURL(previewUrl.value))
         <label
             v-else
             :for="inputId"
-            class="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 text-center transition-colors"
+            class="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 text-center transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brass-500"
             :class="[
                 isDragging ? 'border-brass-500 bg-brass-300/10' : error ? 'border-danger/50' : 'border-line hover:border-sand-400',
                 { 'bg-ink/95 [&_span]:text-sand-300': dark && !isDragging },
@@ -96,8 +103,6 @@ onBeforeUnmount(() => previewUrl.value && URL.revokeObjectURL(previewUrl.value))
             <span class="text-sm text-ink-soft">{{ $t('Drop an image here or click to choose') }}</span>
             <span class="text-xs text-muted">{{ accept === 'image/png' ? 'PNG' : accept.includes('jpeg') ? 'JPG, PNG, WebP' : 'PNG, WebP' }}</span>
         </label>
-
-        <input :id="inputId" type="file" :accept="accept" class="sr-only" @change="setFile($event.target.files[0]); $event.target.value = ''" />
 
         <p v-if="error" class="text-sm text-danger" role="alert">{{ error }}</p>
         <p v-else-if="hint" class="text-xs text-muted">{{ hint }}</p>

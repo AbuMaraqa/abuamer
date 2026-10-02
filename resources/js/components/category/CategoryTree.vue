@@ -221,7 +221,7 @@ provide('categoryTree', {
                     type="search"
                     :placeholder="t('Search categories in any language…')"
                     :aria-label="t('Search categories')"
-                    class="w-full rounded-xl border border-line bg-white py-2.5 ps-11 pe-4 text-sm placeholder:text-sand-400 focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20 focus:outline-none"
+                    class="w-full rounded-xl border border-line bg-white py-2.5 ps-11 pe-4 text-sm placeholder:text-muted/80 focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20 focus:outline-none"
                 />
             </div>
 
