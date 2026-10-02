@@ -6,10 +6,11 @@ import AuthLayout from './layouts/AuthLayout.vue';
 import MainLayout from './layouts/MainLayout.vue';
 
 createInertiaApp({
+    // Public pages receive a complete title from the server ("Page | Site"); admin pages pass just the page name.
     title: (title) => {
         const siteName = usePage().props.site?.name ?? usePage().props.appName;
 
-        return title && title !== siteName ? `${title} | ${siteName}` : siteName;
+        return title && !title.includes(siteName) ? `${title} | ${siteName}` : title || siteName;
     },
     layout: (name) => {
         if (name === 'Maintenance' || name === 'Error') {

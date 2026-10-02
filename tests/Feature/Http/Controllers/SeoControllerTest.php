@@ -1,0 +1,39 @@
+<?php
+
+use App\Models\Category;
+use App\Models\Product;
+
+it('lists every visible page in both languages with their alternates', function () {
+    $porcelain = Category::factory()->named('Porcelain', 'بورسلان')->create();
+    Product::factory()->for($porcelain)->named('Calacatta Gold', 'كالاكاتا ذهبي')->create();
+
+    $response = $this->get(route('sitemap'));
+
+    $response->assertOk()
+        ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
+        ->assertSee('<loc>'.url('ar/about').'</loc>', escape: false)
+        ->assertSee('<loc>'.url('en/products/porcelain').'</loc>', escape: false)
+        ->assertSee('<loc>'.url('en/product/calacatta-gold').'</loc>', escape: false)
+        ->assertSee('hreflang="ar" href="'.url('ar/product/'.rawurlencode('كالاكاتا-ذهبي')).'"', escape: false);
+});
+
+it('leaves hidden categories and inactive products out of the sitemap', function () {
+    $hidden = Category::factory()->named('Hidden Collection')->inactive()->create();
+    Product::factory()->for($hidden)->named('Hidden Product')->create();
+    Product::factory()->named('Inactive Product')->inactive()->create();
+
+    $response = $this->get(route('sitemap'));
+
+    $response->assertDontSee('hidden-collection')
+        ->assertDontSee('hidden-product')
+        ->assertDontSee('inactive-product');
+});
+
+it('disallows the control panel and points crawlers to the sitemap', function () {
+    $response = $this->get(route('robots'));
+
+    $response->assertOk()
+        ->assertSee('Disallow: /ar/admin')
+        ->assertSee('Disallow: /en/login')
+        ->assertSee('Sitemap: '.route('sitemap'));
+});

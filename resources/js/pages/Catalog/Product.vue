@@ -1,5 +1,4 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
 import AppBreadcrumbs from '../../components/breadcrumbs/AppBreadcrumbs.vue';
 import ProductGallery from '../../components/products/ProductGallery.vue';
 import ProductGrid from '../../components/products/ProductGrid.vue';
@@ -16,8 +15,6 @@ const { t } = useTranslations();
 </script>
 
 <template>
-    <Head :title="product.seo_title || product.name" />
-
     <section class="mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 lg:px-8 lg:pt-14">
         <AppBreadcrumbs :items="breadcrumbs" />
 

@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResource;
+use App\Models\Company;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTreeService;
 use App\Support\Breadcrumbs;
 use App\Support\LocalizedUrl;
+use App\Support\Seo\SeoMeta;
+use App\Support\Seo\StructuredData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,6 +46,11 @@ class ProductController extends Controller
             ->withQueryString();
 
         return Inertia::render('Catalog/Index', [
+            'seo' => SeoMeta::make()
+                ->title(__('Products'))
+                ->description(__('Explore our collections of porcelain, ceramic and natural-effect tiles for every space.'))
+                // Filtered and searched listings repeat the catalog, so they stay out of search results.
+                ->noindex($request->filled('q') || $request->filled('category') || $request->boolean('featured')),
             'categories' => CategoryResource::collection($tree->collections()->load('media')),
             'products' => ProductResource::collection($products),
             'filters' => [
@@ -86,13 +94,25 @@ class ProductController extends Controller
             ->limit(4)
             ->get();
 
+        $breadcrumbs = Breadcrumbs::forProduct($tree, $product);
+        $localeUrls = LocalizedUrl::alternates('products.show', fn (string $locale): array => [
+            'slug' => $product->translate($locale, true)->slug,
+        ]);
+        $coverImage = $product->getFirstMedia(Product::MAIN_IMAGE_COLLECTION) ?? $product->getFirstMedia(Product::GALLERY_COLLECTION);
+
         return Inertia::render('Catalog/Product', [
+            'seo' => SeoMeta::make()
+                ->title($product->seo_title ?: $product->name)
+                ->description($product->seo_description ?: ($product->short_description ?: $product->description))
+                ->image($coverImage?->getAvailableFullUrl(['large']))
+                ->type('product')
+                ->alternates($localeUrls)
+                ->withStructuredData(StructuredData::product($product, Company::current()->name ?: config('app.name')))
+                ->withStructuredData(StructuredData::breadcrumbs($breadcrumbs)),
             'product' => ProductDetailResource::make($product),
             'relatedProducts' => ProductResource::collection($relatedProducts),
-            'breadcrumbs' => Breadcrumbs::forProduct($tree, $product),
-            'localeUrls' => LocalizedUrl::alternates('products.show', fn (string $locale): array => [
-                'slug' => $product->translate($locale, true)->slug,
-            ]),
+            'breadcrumbs' => $breadcrumbs,
+            'localeUrls' => $localeUrls,
         ]);
     }
 }

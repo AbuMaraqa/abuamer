@@ -7,6 +7,7 @@ use App\Mail\ContactMessageReceived;
 use App\Models\ContactMessage;
 use App\Settings\ContactSettings;
 use App\Support\Localized;
+use App\Support\Seo\SeoMeta;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
@@ -20,6 +21,9 @@ class ContactController extends Controller
     public function show(ContactSettings $contact): Response
     {
         return Inertia::render('Contact', [
+            'seo' => SeoMeta::make()
+                ->title(__('Contact'))
+                ->description(__('Our team will help you choose the right tiles, sizes and finishes for your space.')),
             'mapEmbedUrl' => $contact->map_embed_url ?: null,
             'workingHours' => Localized::value($contact->working_hours) ?: null,
         ]);

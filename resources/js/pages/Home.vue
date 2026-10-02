@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import CategoryCard from '../components/category/CategoryCard.vue';
 import Icon from '../components/common/Icon.vue';
@@ -22,8 +22,6 @@ const { t } = useTranslations();
 </script>
 
 <template>
-    <Head :title="company.name" />
-
     <!-- Hero -->
     <section class="relative isolate flex min-h-[92svh] items-end overflow-hidden bg-ink text-white">
         <img

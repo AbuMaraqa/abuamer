@@ -13,6 +13,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Inertia\ExceptionResponse;
+use Inertia\Inertia;
 use Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
 use Throwable;
 
@@ -46,6 +48,18 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(fn (User $user): ?bool => $user->hasRole(Role::Admin) ? true : null);
 
         RateLimiter::for('contact', fn (Request $request): Limit => Limit::perMinutes(10, 5)->by($request->ip()));
+
+        // Branded error pages in production; debug mode keeps Laravel's detailed error pages.
+        Inertia::handleExceptionsUsing(function (ExceptionResponse $response) {
+            if (config('app.debug') || ! in_array($response->statusCode(), [403, 404, 419, 429, 500, 503], true)) {
+                return null;
+            }
+
+            return $response->render('Error', [
+                'status' => $response->statusCode(),
+                'homeUrl' => route('home'),
+            ])->withSharedData();
+        });
 
         $this->applyDefaultLocale();
     }

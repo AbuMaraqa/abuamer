@@ -10,6 +10,8 @@ use App\Models\Product;
 use App\Services\Catalog\CategoryTreeService;
 use App\Support\Breadcrumbs;
 use App\Support\LocalizedUrl;
+use App\Support\Seo\SeoMeta;
+use App\Support\Seo\StructuredData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -44,16 +46,27 @@ class CategoryController extends Controller
             ->filter(fn (Category $sibling): bool => $sibling->status && $sibling->id !== $category->id)
             ->values();
 
+        $detail = Category::query()->with(['translations', 'media'])->findOrFail($category->id);
+        $breadcrumbs = Breadcrumbs::forCategory($tree, $category);
+        $localeUrls = LocalizedUrl::alternates('products.category', fn (string $locale): array => [
+            'path' => $tree->slugPath($category->id, $locale),
+        ]);
+
         return Inertia::render('Catalog/Category', [
-            'category' => CategoryDetailResource::make(Category::query()->with(['translations', 'media'])->findOrFail($category->id)),
+            'seo' => SeoMeta::make()
+                ->title($detail->seo_title ?: $detail->name)
+                ->description($detail->seo_description ?: $detail->description)
+                ->image($detail->getFirstMedia(Category::IMAGE_COLLECTION)?->getAvailableFullUrl(['large']))
+                ->alternates($localeUrls)
+                ->noindex($request->filled('q'))
+                ->withStructuredData(StructuredData::breadcrumbs($breadcrumbs)),
+            'category' => CategoryDetailResource::make($detail),
             'children' => CategoryResource::collection($tree->children($category->id)->filter->status->values()->load('media')),
             'relatedCategories' => CategoryResource::collection($relatedCategories->load('media')),
             'products' => ProductResource::collection($products),
             'filters' => ['q' => $request->string('q')->trim()->value()],
-            'breadcrumbs' => Breadcrumbs::forCategory($tree, $category),
-            'localeUrls' => LocalizedUrl::alternates('products.category', fn (string $locale): array => [
-                'path' => $tree->slugPath($category->id, $locale),
-            ]),
+            'breadcrumbs' => $breadcrumbs,
+            'localeUrls' => $localeUrls,
         ]);
     }
 }

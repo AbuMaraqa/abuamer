@@ -11,6 +11,8 @@ use App\Models\Company;
 use App\Models\CompanyHighlight;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTreeService;
+use App\Support\Seo\SeoMeta;
+use App\Support\Seo\StructuredData;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,6 +24,7 @@ class HomeController extends Controller
     public function __invoke(CategoryTreeService $categoryTree): Response
     {
         $tree = $categoryTree->tree();
+        $company = Company::current();
         $highlights = CompanyHighlight::query()->with('translations')->ordered()->get();
 
         $featuredProducts = Product::query()
@@ -34,7 +37,8 @@ class HomeController extends Controller
             ->get();
 
         return Inertia::render('Home', [
-            'company' => CompanyResource::make(Company::current()),
+            'seo' => SeoMeta::make()->withStructuredData(StructuredData::organization($company)),
+            'company' => CompanyResource::make($company),
             'collections' => CategoryResource::collection($tree->collections()->load('media')),
             'featuredProducts' => ProductResource::collection($featuredProducts),
             'features' => CompanyHighlightResource::collection($highlights->where('type', HighlightType::Feature)->values()),

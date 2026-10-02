@@ -11,6 +11,7 @@ use App\Services\Catalog\CategoryTreeService;
 use App\Settings\ContactSettings;
 use App\Settings\SocialSettings;
 use App\Support\Localized;
+use App\Support\Seo\SeoMeta;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Middleware;
@@ -65,6 +66,8 @@ class HandleInertiaRequests extends Middleware
             'localeUrls' => fn (): array => $this->localeUrls(),
             'translations' => Inertia::once(fn (): array => $this->translations()),
             'site' => Inertia::once(fn (): array => $this->site()),
+            // Pages with their own metadata pass a "seo" prop that replaces this default.
+            'seo' => fn (): array => SeoMeta::make()->noindex($request->routeIs('admin.*', 'login'))->toArray(),
             'auth' => [
                 'user' => fn (): ?array => $this->authenticatedUser($request->user()),
             ],

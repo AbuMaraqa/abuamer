@@ -1,5 +1,5 @@
 <script setup>
-import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { route } from 'ziggy-js';
 import AppButton from '../components/common/AppButton.vue';
@@ -45,8 +45,6 @@ function submit() {
 </script>
 
 <template>
-    <Head :title="t('Contact')" />
-
     <section class="mx-auto max-w-7xl px-4 pt-16 pb-12 sm:px-6 lg:px-8 lg:pt-20">
         <p class="eyebrow">{{ t('Contact') }}</p>
         <h1 class="mt-4 max-w-3xl font-display text-5xl leading-tight text-ink sm:text-6xl">{{ t('Let’s talk about your project') }}</h1>

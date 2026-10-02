@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import AppBreadcrumbs from '../../components/breadcrumbs/AppBreadcrumbs.vue';
 import CategoryCard from '../../components/category/CategoryCard.vue';
 import PaginationLinks from '../../components/common/PaginationLinks.vue';
@@ -20,8 +20,6 @@ const { t } = useTranslations();
 </script>
 
 <template>
-    <Head :title="category.seo_title || category.name" />
-
     <section class="relative overflow-hidden bg-ink text-white">
         <img v-if="category.image" :src="category.image.large" alt="" class="absolute inset-0 h-full w-full object-cover opacity-45" />
         <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/10" />

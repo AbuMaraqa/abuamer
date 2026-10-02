@@ -1,5 +1,4 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import ImageLightbox from '../components/common/ImageLightbox.vue';
 import CtaSection from '../components/sections/CtaSection.vue';
@@ -20,8 +19,6 @@ const lightboxIndex = ref(null);
 </script>
 
 <template>
-    <Head :title="t('About us')" />
-
     <section class="relative overflow-hidden bg-ink text-white">
         <img v-if="company.about_image" :src="company.about_image.large" alt="" class="absolute inset-0 h-full w-full object-cover opacity-35" />
         <div class="absolute inset-0 bg-gradient-to-t from-ink to-ink/30" aria-hidden="true" />
