@@ -67,7 +67,7 @@ function destroy() {
             </div>
 
             <div class="min-w-0 flex-1">
-                <Link :href="route('admin.brands.edit', brand.id)" class="block truncate font-medium text-ink hover:text-brass-700" dir="auto">{{ brand.name }}</Link>
+                <Link :href="route('admin.brands.edit', brand.id)" class="block truncate font-medium text-ink hover:text-brass-700"><bdi>{{ brand.name }}</bdi></Link>
                 <p class="mt-1 truncate text-xs text-muted">
                     <template v-if="brand.country">{{ countryName(brand.country) }} · </template>
                     {{ t(':count products', { count: brand.products_count }) }}

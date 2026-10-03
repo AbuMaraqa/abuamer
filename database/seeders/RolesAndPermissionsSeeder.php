@@ -12,8 +12,11 @@ use Spatie\Permission\PermissionRegistrar;
 class RolesAndPermissionsSeeder extends Seeder
 {
     /**
-     * Sync the roles and permissions defined by the application enums.
-     * Safe to run repeatedly, including on production deployments.
+     * Sync the permissions and the built-in roles defined by the application enums.
+     * Safe to run repeatedly, including on production deployments: the administrator
+     * always receives every permission, while the other built-in roles get their
+     * default permissions only when they are created, so changes made to them in the
+     * control panel are kept.
      */
     public function run(): void
     {
@@ -24,9 +27,13 @@ class RolesAndPermissionsSeeder extends Seeder
         }
 
         foreach (RoleName::cases() as $roleName) {
-            Role::findOrCreate($roleName->value)->syncPermissions(
-                array_map(fn (PermissionName $permission): string => $permission->value, $roleName->permissions()),
-            );
+            $role = Role::query()->where('name', $roleName->value)->first();
+
+            if ($role === null || $roleName === RoleName::Admin) {
+                Role::findOrCreate($roleName->value)->syncPermissions(
+                    array_map(fn (PermissionName $permission): string => $permission->value, $roleName->permissions()),
+                );
+            }
         }
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();

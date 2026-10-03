@@ -25,9 +25,9 @@ defineProps({
         <div class="flex flex-col gap-1">
             <p v-if="product.category" class="eyebrow">{{ product.category.name }}</p>
             <h3 class="font-display text-lg leading-snug text-ink transition-colors group-hover:text-brass-700 sm:text-xl">{{ product.name }}</h3>
-            <!-- dir on the brand and code only, so they still align with the name in right-to-left pages. -->
+            <!-- The brand and code are isolated from the text direction, so they still align with the name in right-to-left pages. -->
             <p v-if="product.brand || product.sku" class="flex min-w-0 items-center gap-1.5 text-xs text-muted">
-                <span v-if="product.brand" class="truncate font-medium text-ink-soft" dir="auto">{{ product.brand.name }}</span>
+                <bdi v-if="product.brand" class="truncate font-medium text-ink-soft">{{ product.brand.name }}</bdi>
                 <span v-if="product.brand && product.sku" class="text-sand-400" aria-hidden="true">·</span>
                 <span v-if="product.sku" class="truncate" dir="ltr">{{ product.sku }}</span>
             </p>

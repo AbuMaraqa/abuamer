@@ -16,7 +16,7 @@ defineProps({
         </div>
         <div class="flex items-center justify-between gap-3 border-t border-line px-4 py-3.5 sm:px-5">
             <div class="min-w-0">
-                <p class="truncate text-sm font-medium text-ink" dir="auto">{{ brand.name }}</p>
+                <p class="truncate text-sm font-medium text-ink"><bdi>{{ brand.name }}</bdi></p>
                 <p class="mt-0.5 truncate text-xs text-muted">
                     <template v-if="brand.country">{{ countryName(brand.country) }}</template>
                     <template v-if="brand.country && brand.products_count !== undefined"> · </template>

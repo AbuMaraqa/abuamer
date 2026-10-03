@@ -125,7 +125,7 @@ onBeforeUnmount(() => observer?.disconnect());
                                     <Icon name="file-text" :size="20" />
                                 </span>
                                 <span class="min-w-0 grow">
-                                    <span class="block truncate text-sm font-medium text-ink" dir="auto">{{ document.name }}</span>
+                                    <span class="block truncate text-sm font-medium text-ink"><bdi>{{ document.name }}</bdi></span>
                                     <span class="block text-xs text-muted" dir="ltr">{{ document.extension }} · {{ document.size }}</span>
                                 </span>
                                 <Icon name="download" :size="18" class="shrink-0 text-muted transition-colors group-hover:text-ink" />

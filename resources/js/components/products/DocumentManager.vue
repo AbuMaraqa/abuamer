@@ -39,7 +39,7 @@ function formatSize(bytes) {
                 </button>
                 <Icon name="file-text" :size="20" class="shrink-0 text-brass-600" />
                 <a :href="document.url" target="_blank" rel="noopener" class="min-w-0 grow">
-                    <span class="block truncate text-sm text-ink hover:underline" dir="auto">{{ document.name }}</span>
+                    <span class="block truncate text-sm text-ink hover:underline"><bdi>{{ document.name }}</bdi></span>
                     <span class="block text-xs text-muted" dir="ltr">{{ document.extension }} · {{ document.size }}</span>
                 </a>
                 <button type="button" class="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-danger/5 hover:text-danger" :aria-label="t('Remove file')" @click="documents.splice(index, 1)">
@@ -54,7 +54,7 @@ function formatSize(bytes) {
                     <span class="w-6 shrink-0" />
                     <Icon name="file-text" :size="20" class="shrink-0 text-brass-600" />
                     <span class="min-w-0 grow">
-                        <span class="block truncate text-sm text-ink" dir="auto">{{ file.name }}</span>
+                        <span class="block truncate text-sm text-ink"><bdi>{{ file.name }}</bdi></span>
                         <span class="block text-xs text-muted" dir="ltr">PDF · {{ formatSize(file.size) }}</span>
                     </span>
                     <span class="shrink-0 rounded-full bg-brass-600 px-2 py-0.5 text-[10px] text-white">{{ t('New') }}</span>

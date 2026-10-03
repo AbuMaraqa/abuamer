@@ -12,10 +12,12 @@ use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\SlideReorderController;
 use App\Http\Controllers\Admin\SlideStatusController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +55,9 @@ Route::get('company', [CompanyController::class, 'edit'])->name('company.edit');
 Route::put('company', [CompanyController::class, 'update'])->name('company.update');
 
 Route::resource('messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
+
+Route::resource('users', UserController::class)->except('show');
+Route::resource('roles', RoleController::class)->except('show');
 
 Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
 Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');

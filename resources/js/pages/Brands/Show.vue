@@ -47,7 +47,7 @@ function displayUrl(url) {
 
                 <div class="flex flex-col gap-4">
                     <p class="eyebrow">{{ t('Brand') }}</p>
-                    <h1 class="font-display text-4xl leading-tight text-ink sm:text-5xl" dir="auto">{{ brand.name }}</h1>
+                    <h1 class="font-display text-4xl leading-tight text-ink sm:text-5xl"><bdi>{{ brand.name }}</bdi></h1>
                     <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
                         <span v-if="brand.country" class="inline-flex items-center gap-1.5">
                             <Icon name="map-pin" :size="16" class="text-brass-600" />

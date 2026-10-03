@@ -57,6 +57,15 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        // The password was right, so saying why the account cannot sign in reveals nothing new.
+        if (! Auth::user()->is_active) {
+            Auth::guard('web')->logout();
+
+            throw ValidationException::withMessages([
+                'email' => __('This account has been deactivated. Please contact your administrator.'),
+            ]);
+        }
     }
 
     /**

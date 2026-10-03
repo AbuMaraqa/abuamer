@@ -8,6 +8,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SeoController;
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\ShowMaintenancePage;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -43,6 +44,6 @@ Route::group([
 
     Route::prefix('admin')
         ->name('admin.')
-        ->middleware('auth')
+        ->middleware(['auth', EnsureUserIsActive::class])
         ->group(__DIR__.'/admin.php');
 });

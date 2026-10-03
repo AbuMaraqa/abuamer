@@ -197,7 +197,7 @@ const deleting = ref(null);
                                     {{ product.name }}
                                 </Link>
                                 <p v-if="product.brand || product.sku" class="flex min-w-0 items-center gap-1.5 text-xs text-muted">
-                                    <span v-if="product.brand" class="truncate text-ink-soft" dir="auto">{{ product.brand.name }}</span>
+                                    <bdi v-if="product.brand" class="truncate text-ink-soft">{{ product.brand.name }}</bdi>
                                     <span v-if="product.brand && product.sku" aria-hidden="true">·</span>
                                     <span v-if="product.sku" class="truncate font-mono" dir="ltr">{{ product.sku }}</span>
                                 </p>
