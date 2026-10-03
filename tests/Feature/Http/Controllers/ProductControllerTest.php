@@ -1,8 +1,11 @@
 <?php
 
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductSpecification;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 describe('index', function () {
@@ -154,5 +157,75 @@ describe('show', function () {
         $response = $this->get(route('products.show', ['slug' => $product->translate('ar')->slug]));
 
         $response->assertNotFound();
+    });
+});
+
+describe('brands', function () {
+    it('filters the catalog by brand and offers only the brands with products in it', function () {
+        $categories = createCategoryTree(['Mixers' => [], 'Hidden' => []]);
+        $categories['Hidden']->update(['status' => false]);
+        $aquaro = Brand::factory()->named('Aquaro')->create();
+        $nordbad = Brand::factory()->named('Nordbad')->create();
+        Brand::factory()->named('Velaria')->create();
+        $hiddenOnly = Brand::factory()->named('Arvento')->create();
+        $match = Product::factory()->for($aquaro)->for($categories['Mixers'])->create();
+        Product::factory()->for($nordbad)->for($categories['Mixers'])->create();
+        Product::factory()->for($hiddenOnly)->for($categories['Hidden'])->create();
+
+        $response = $this->get(route('products.index', ['brand' => 'aquaro']));
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('brands', fn ($brands) => collect($brands)->pluck('slug')->all() === ['aquaro', 'nordbad'])
+            ->where('filters.brand', 'aquaro')
+            ->where('seo.robots', fn (string $robots): bool => str_contains($robots, 'noindex'))
+            ->has('products.data', 1)
+            ->where('products.data.0.id', $match->id)
+            ->where('products.data.0.brand.name', 'Aquaro'));
+    });
+
+    it('ignores an unknown brand in the filter', function () {
+        Product::factory()->count(2)->create();
+
+        $response = $this->get(route('products.index', ['brand' => 'unknown']));
+
+        $response->assertInertia(fn (Assert $page) => $page->where('filters.brand', null)->has('products.data', 2));
+    });
+
+    it('filters a category page by brand', function () {
+        $categories = createCategoryTree(['Sanitary Ware' => ['Mixers' => [], 'Basins' => []]]);
+        $brand = Brand::factory()->named('Aquaro')->create();
+        $mixer = Product::factory()->for($brand)->for($categories['Mixers'])->create();
+        Product::factory()->for($categories['Basins'])->create();
+
+        $response = $this->get(route('products.category', ['path' => 'sanitary-ware', 'brand' => 'aquaro']));
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Catalog/Category')
+            ->has('brands', 1)
+            ->has('products.data', 1)
+            ->where('products.data.0.id', $mixer->id));
+    });
+
+    it('shows the brand and the downloadable documents on the product page', function () {
+        Storage::fake('public');
+        $product = Product::factory()->for(Brand::factory()->named('Aquaro'))->named('Linea Basin Mixer')->create();
+        $product->addMedia(UploadedFile::fake()->createWithContent('Data sheet.pdf', "%PDF-1.4\n%%EOF\n"))->toMediaCollection(Product::DOCUMENTS_COLLECTION);
+
+        $response = $this->get(route('products.show', ['slug' => $product->translate('ar')->slug]));
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('product.brand.name', 'Aquaro')
+            ->where('product.brand.url', route('brands.show', ['brand' => 'aquaro']))
+            ->has('product.documents', 1)
+            ->where('product.documents.0.name', 'Data sheet')
+            ->where('product.documents.0.extension', 'PDF'));
+    });
+
+    it('does not name a hidden brand on its products', function () {
+        $product = Product::factory()->for(Brand::factory()->inactive())->create();
+
+        $response = $this->get(route('products.show', ['slug' => $product->translate('ar')->slug]));
+
+        $response->assertInertia(fn (Assert $page) => $page->where('product.brand', null));
     });
 });

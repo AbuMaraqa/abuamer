@@ -7,8 +7,9 @@ use App\Models\User;
 use Illuminate\Validation\Validator;
 
 /**
- * The password is changed only when a new one is typed. Administrators cannot lock
- * themselves out, and the last active administrator cannot lose that role.
+ * The password is changed only when a new one is typed. Administrators cannot
+ * deactivate themselves or give up their own role, so there is always at least one
+ * active administrator: the one making the change.
  */
 class UpdateUserRequest extends StoreUserRequest
 {
@@ -24,31 +25,16 @@ class UpdateUserRequest extends StoreUserRequest
     {
         return [
             function (Validator $validator): void {
-                if ($validator->errors()->isNotEmpty()) {
+                if ($validator->errors()->isNotEmpty() || ! $this->account()->is($this->user())) {
                     return;
                 }
 
-                $account = $this->account();
-                $staysAdministrator = $this->role()->name === RoleName::Admin->value;
-                $staysActive = $this->boolean('is_active');
-
-                if ($account->is($this->user())) {
-                    if (! $staysActive) {
-                        $validator->errors()->add('is_active', __('You cannot deactivate your own account.'));
-                    }
-
-                    if ($account->isAdministrator() && ! $staysAdministrator) {
-                        $validator->errors()->add('role_id', __('You cannot remove your own administrator role.'));
-                    }
-
-                    return;
+                if (! $this->boolean('is_active')) {
+                    $validator->errors()->add('is_active', __('You cannot deactivate your own account.'));
                 }
 
-                $isLastAdministrator = $account->is_active && $account->isAdministrator()
-                    && User::query()->active()->role(RoleName::Admin)->whereKeyNot($account->id)->doesntExist();
-
-                if ($isLastAdministrator && (! $staysAdministrator || ! $staysActive)) {
-                    $validator->errors()->add('role_id', __('This is the only active administrator. Make someone else an administrator first.'));
+                if ($this->role()->name !== RoleName::Admin->value) {
+                    $validator->errors()->add('role_id', __('You cannot remove your own administrator role.'));
                 }
             },
         ];

@@ -25,6 +25,7 @@ const shortcuts = computed(() =>
         can['products.create'] && { label: t('Add product'), icon: 'plus', href: route('admin.products.create') },
         can['categories.create'] && { label: t('Add category'), icon: 'folder', href: route('admin.categories.create') },
         can['brands.manage'] && { label: t('Add brand'), icon: 'tag', href: route('admin.brands.create') },
+        can['users.manage'] && { label: t('Add user'), icon: 'users', href: route('admin.users.create') },
         can['company.manage'] && { label: t('Edit company content'), icon: 'building', href: route('admin.company.edit') },
         can['settings.manage'] && { label: t('Contact details and SEO'), icon: 'settings', href: route('admin.settings.edit') },
     ].filter(Boolean),

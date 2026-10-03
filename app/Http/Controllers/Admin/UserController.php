@@ -96,7 +96,8 @@ class UserController extends Controller
     }
 
     /**
-     * Delete a staff account. Nobody can delete their own account or the last active administrator.
+     * Delete a staff account. Nobody can delete their own account, so the administrator
+     * deleting always remains.
      */
     public function destroy(Request $request, User $user): RedirectResponse
     {
@@ -104,10 +105,6 @@ class UserController extends Controller
 
         if ($user->is($request->user())) {
             throw ValidationException::withMessages(['user' => __('You cannot delete your own account.')]);
-        }
-
-        if ($user->is_active && $user->isAdministrator() && User::query()->active()->role(RoleName::Admin)->whereKeyNot($user->id)->doesntExist()) {
-            throw ValidationException::withMessages(['user' => __('This is the only active administrator. Make someone else an administrator first.')]);
         }
 
         $user->delete();

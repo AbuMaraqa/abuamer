@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\CompanyHighlight;
 use App\Models\Product;
@@ -71,4 +72,34 @@ it('shares the visible collections as the navigation', function () {
         ->where('site.navigation.0.name', 'Porcelain')
         ->where('site.navigation.0.children.0.name', 'Marble Effect')
         ->has('site.navigation.0.children.0.children', 0));
+});
+
+it('presents several root categories as departments with their collections', function () {
+    createCategoryTree(['Tiles & Marble' => ['Porcelain' => []], 'Sanitary Ware' => ['Toilets' => [], 'Mixers' => []]]);
+
+    $response = $this->get(route('home'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->has('departments', 2)
+        ->where('departments.1.name', 'Sanitary Ware')
+        ->where('departments.1.children', fn ($children) => collect($children)->pluck('name')->all() === ['Toilets', 'Mixers']));
+});
+
+it('shows the collections instead of departments for a single product line', function () {
+    createCategoryTree(['Tiles' => ['Porcelain' => [], 'Wall Tiles' => []]]);
+
+    $response = $this->get(route('home'));
+
+    $response->assertInertia(fn (Assert $page) => $page->has('departments', 0)->has('collections', 2));
+});
+
+it('shows the visible brands that have products', function () {
+    $brand = Brand::factory()->named('Aquaro')->create();
+    Product::factory()->for($brand)->create();
+    Brand::factory()->named('Empty')->create();
+    Product::factory()->for(Brand::factory()->named('Hidden')->inactive())->create();
+
+    $response = $this->get(route('home'));
+
+    $response->assertInertia(fn (Assert $page) => $page->has('brands', 1)->where('brands.0.name', 'Aquaro'));
 });

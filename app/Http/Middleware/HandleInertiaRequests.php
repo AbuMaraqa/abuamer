@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\Permission;
+use App\Enums\Role;
 use App\Http\Resources\CategoryResource;
 use App\Models\Brand;
 use App\Models\Company;
@@ -168,7 +169,7 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * @return array{id: int, name: string, email: string, can: array<string, bool>}|null
+     * @return array{id: int, name: string, email: string, role: string|null, can: array<string, bool>}|null
      */
     private function authenticatedUser(?User $user): ?array
     {
@@ -176,10 +177,13 @@ class HandleInertiaRequests extends Middleware
             return null;
         }
 
+        $role = $user->roles->first()?->name;
+
         return [
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'role' => $role === null ? null : (Role::tryFrom($role)?->label() ?? $role),
             'can' => collect(Permission::cases())
                 ->mapWithKeys(fn (Permission $permission): array => [$permission->value => $user->can($permission->value)])
                 ->all(),

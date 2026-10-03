@@ -68,3 +68,31 @@ it('logs the user out', function () {
     $response->assertRedirect(route('home'));
     $this->assertGuest();
 });
+
+it('records the time of each sign-in', function () {
+    $user = User::factory()->create();
+
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password']);
+
+    expect($user->fresh()->last_login_at)->not->toBeNull();
+});
+
+it('refuses a deactivated account', function () {
+    $user = User::factory()->inactive()->create();
+
+    $response = $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password']);
+
+    $response->assertSessionHasErrors(['email' => 'تم تعطيل هذا الحساب. يرجى التواصل مع مدير النظام.']);
+    $this->assertGuest();
+});
+
+it('signs out a user whose account was deactivated during their session', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $user->update(['is_active' => false]);
+
+    $response = $this->get(route('admin.dashboard'));
+
+    $response->assertRedirect(route('login'));
+    $this->assertGuest();
+});

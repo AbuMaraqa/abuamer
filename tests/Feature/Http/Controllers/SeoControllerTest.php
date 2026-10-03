@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 
@@ -47,4 +48,15 @@ it('disallows the control panel and points crawlers to the sitemap', function ()
         ->assertSee('Disallow: /ar/admin')
         ->assertSee('Disallow: /en/login')
         ->assertSee('Sitemap: '.route('sitemap'));
+});
+
+it('lists the brands page and the visible brand pages', function () {
+    Brand::factory()->named('Aquaro')->create();
+    Brand::factory()->named('Secret Brand')->inactive()->create();
+
+    $response = $this->get(route('sitemap'));
+
+    $response->assertSee('<loc>'.url('ar/brands').'</loc>', escape: false)
+        ->assertSee('<loc>'.url('en/brands/aquaro').'</loc>', escape: false)
+        ->assertDontSee('secret-brand');
 });

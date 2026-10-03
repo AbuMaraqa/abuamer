@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Permission;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductSpecification;
@@ -28,7 +29,7 @@ function productPayload(Category $category, array $overrides = []): array
             ['id' => null, 'ar' => ['label' => 'المقاس', 'value' => '60 × 120 سم'], 'en' => ['label' => 'Size', 'value' => '60 × 120 cm']],
             ['id' => null, 'ar' => ['label' => 'السماكة', 'value' => '9 مم'], 'en' => ['label' => 'Thickness', 'value' => '9 mm']],
         ],
-    ], $overrides), ...Arr::only($overrides, ['specifications', 'gallery', 'gallery_uploads'])];
+    ], $overrides), ...Arr::only($overrides, ['specifications', 'gallery', 'gallery_uploads', 'documents', 'document_uploads'])];
 }
 
 describe('index', function () {
@@ -322,3 +323,77 @@ describe('destroy', function () {
         $this->assertModelExists($product);
     });
 });
+
+describe('brand and documents', function () {
+    it('saves the brand of a product and offers every brand in the form', function () {
+        $brand = Brand::factory()->named('Aquaro')->create();
+        $hidden = Brand::factory()->named('Nordbad')->inactive()->create();
+
+        $this->actingAs(admin())->get(route('admin.products.create'))->assertInertia(fn (Assert $page) => $page
+            ->where('brands', fn ($brands) => collect($brands)->pluck('id')->sort()->values()->all() === [$brand->id, $hidden->id]));
+
+        $this->actingAs(admin())->post(route('admin.products.store'), productPayload(Category::factory()->create(), ['brand_id' => $brand->id]));
+
+        expect(Product::sole()->brand_id)->toBe($brand->id);
+    });
+
+    it('clears the brand of a product', function () {
+        $product = Product::factory()->for(Brand::factory())->create();
+
+        $this->actingAs(admin())->put(route('admin.products.update', $product), productPayload($product->category, ['brand_id' => '']));
+
+        expect($product->fresh()->brand_id)->toBeNull();
+    });
+
+    it('rejects a brand that does not exist', function () {
+        $response = $this->actingAs(admin())->post(route('admin.products.store'), productPayload(Category::factory()->create(), ['brand_id' => 999]));
+
+        $response->assertSessionHasErrors('brand_id');
+    });
+
+    it('filters the list by brand', function () {
+        $brand = Brand::factory()->create();
+        $branded = Product::factory()->for($brand)->create();
+        Product::factory()->create();
+
+        $response = $this->actingAs(admin())->get(route('admin.products.index', ['brand' => $brand->id]));
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('products.meta.total', 1)
+            ->where('products.data.0.id', $branded->id)
+            ->where('products.data.0.brand.name', $brand->name));
+    });
+
+    it('keeps, reorders, removes and appends PDF documents', function () {
+        Storage::fake('public');
+        $product = Product::factory()->create();
+        $first = $product->addMedia(pdfUpload('first.pdf'))->toMediaCollection(Product::DOCUMENTS_COLLECTION);
+        $second = $product->addMedia(pdfUpload('second.pdf'))->toMediaCollection(Product::DOCUMENTS_COLLECTION);
+        $removed = $product->addMedia(pdfUpload('removed.pdf'))->toMediaCollection(Product::DOCUMENTS_COLLECTION);
+
+        $response = $this->actingAs(admin())->put(route('admin.products.update', $product), productPayload($product->category, [
+            'documents' => [$second->id, $first->id],
+            'document_uploads' => [pdfUpload('installation-guide.pdf')],
+        ]));
+
+        $response->assertSessionHasNoErrors();
+        expect($product->fresh()->getMedia(Product::DOCUMENTS_COLLECTION)->pluck('file_name')->all())->toBe(['second.pdf', 'first.pdf', 'installation-guide.pdf']);
+        $this->assertModelMissing($removed);
+    });
+
+    it('accepts only PDF documents', function () {
+        Storage::fake('public');
+
+        $response = $this->actingAs(admin())->post(route('admin.products.store'), productPayload(Category::factory()->create(), [
+            'document_uploads' => [UploadedFile::fake()->image('photo.jpg', 800, 800)],
+        ]));
+
+        $response->assertSessionHasErrors('document_uploads.0');
+        expect(Product::count())->toBe(0);
+    });
+});
+
+function pdfUpload(string $name): UploadedFile
+{
+    return UploadedFile::fake()->createWithContent($name, "%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n");
+}

@@ -23,6 +23,8 @@ const navigation = [
     { label: 'Slider', icon: 'image', routeName: 'admin.slides.index', active: 'admin.slides.*', permission: 'company.manage' },
     { label: 'Company', icon: 'building', routeName: 'admin.company.edit', active: 'admin.company.*', permission: 'company.manage' },
     { label: 'Messages', icon: 'mail', routeName: 'admin.messages.index', active: 'admin.messages.*', permission: 'messages.manage', badge: 'unreadMessages' },
+    { label: 'Users', icon: 'users', routeName: 'admin.users.index', active: 'admin.users.*', permission: 'users.manage' },
+    { label: 'Roles & permissions', icon: 'shield', routeName: 'admin.roles.index', active: 'admin.roles.*', permission: 'users.manage' },
     { label: 'Settings', icon: 'settings', routeName: 'admin.settings.edit', active: 'admin.settings.*', permission: 'settings.manage' },
 ];
 
@@ -95,7 +97,10 @@ useFocusTrap(sidebar, () => isSidebarOpen.value);
 
                 <div class="ms-auto flex items-center gap-5 text-sm">
                     <LanguageSwitcher class="text-muted" />
-                    <span class="hidden text-muted sm:inline">{{ $page.props.auth.user?.name }}</span>
+                    <span class="hidden flex-col items-end leading-tight sm:flex">
+                        <span class="text-ink-soft">{{ $page.props.auth.user?.name }}</span>
+                        <span v-if="$page.props.auth.user?.role" class="text-[11px] text-muted">{{ $page.props.auth.user.role }}</span>
+                    </span>
                     <Link :href="route('logout')" method="post" as="button" class="inline-flex items-center gap-1.5 text-muted transition-colors hover:text-danger">
                         <Icon name="log-out" :size="18" />
                         <span class="hidden sm:inline">{{ $t('Log out') }}</span>
