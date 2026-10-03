@@ -18,6 +18,7 @@ import { useTranslations } from '../../../composables/useTranslations';
 const props = defineProps({
     products: { type: Object, required: true },
     categories: { type: Array, required: true },
+    brands: { type: Array, required: true },
     filters: { type: Object, required: true },
 });
 
@@ -36,6 +37,7 @@ function applyFilters() {
             q: filters.value.q || undefined,
             category: filters.value.category ?? undefined,
             descendants: filters.value.category && !filters.value.descendants ? 0 : undefined,
+            brand: filters.value.brand ?? undefined,
             status: filters.value.status ?? undefined,
             featured: filters.value.featured ?? undefined,
         },
@@ -48,15 +50,20 @@ watch(() => filters.value.q, () => {
     searchTimer = setTimeout(applyFilters, 350);
 });
 
-watch(() => [filters.value.category, filters.value.descendants, filters.value.status, filters.value.featured], applyFilters);
+watch(() => [filters.value.category, filters.value.descendants, filters.value.brand, filters.value.status, filters.value.featured], applyFilters);
 
 onBeforeUnmount(() => clearTimeout(searchTimer));
 
-const hasFilters = computed(() => !!(filters.value.q || filters.value.category || filters.value.status || filters.value.featured));
+const hasFilters = computed(() => !!(filters.value.q || filters.value.category || filters.value.brand || filters.value.status || filters.value.featured));
 
 function clearFilters() {
-    filters.value = { q: '', category: null, descendants: true, status: null, featured: null };
+    filters.value = { q: '', category: null, descendants: true, brand: null, status: null, featured: null };
 }
+
+const brandOptions = computed(() => [
+    { value: null, label: t('All brands') },
+    ...props.brands.map((brand) => ({ value: brand.id, label: brand.name })),
+]);
 
 const statusOptions = [
     { value: null, label: t('Any status') },
@@ -125,7 +132,10 @@ const deleting = ref(null);
         </template>
     </PageHeader>
 
-    <section class="mb-5 grid grid-cols-2 gap-3 rounded-2xl border border-line bg-white p-3 sm:p-4 xl:grid-cols-[1.4fr_1.4fr_1fr_1fr]">
+    <section
+        class="mb-5 grid grid-cols-2 gap-3 rounded-2xl border border-line bg-white p-3 sm:p-4"
+        :class="brands.length > 0 ? 'xl:grid-cols-[1.4fr_1.4fr_1fr_1fr_1fr]' : 'xl:grid-cols-[1.4fr_1.4fr_1fr_1fr]'"
+    >
         <div class="relative col-span-2 md:col-span-1">
             <Icon name="search" :size="18" class="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-muted" />
             <input
@@ -143,6 +153,7 @@ const deleting = ref(null);
                 {{ t('Include subcategories') }}
             </label>
         </div>
+        <SelectInput v-if="brands.length > 0" v-model="filters.brand" :options="brandOptions" :aria-label="t('Brand')" />
         <SelectInput v-model="filters.status" :options="statusOptions" :aria-label="t('Status')" />
         <SelectInput v-model="filters.featured" :options="featuredOptions" :aria-label="t('Featured')" />
         <button v-if="hasFilters" type="button" class="col-span-2 justify-self-start text-sm text-brass-700 hover:underline xl:col-span-1" @click="clearFilters">{{ t('Clear filters') }}</button>
@@ -185,7 +196,11 @@ const deleting = ref(null);
                                 <Link :href="route('admin.products.edit', product.id)" class="block truncate font-medium text-ink hover:text-brass-700">
                                     {{ product.name }}
                                 </Link>
-                                <p v-if="product.sku" class="truncate font-mono text-xs text-muted" dir="ltr">{{ product.sku }}</p>
+                                <p v-if="product.brand || product.sku" class="flex min-w-0 items-center gap-1.5 text-xs text-muted">
+                                    <span v-if="product.brand" class="truncate text-ink-soft" dir="auto">{{ product.brand.name }}</span>
+                                    <span v-if="product.brand && product.sku" aria-hidden="true">·</span>
+                                    <span v-if="product.sku" class="truncate font-mono" dir="ltr">{{ product.sku }}</span>
+                                </p>
                             </div>
                         </div>
                     </td>

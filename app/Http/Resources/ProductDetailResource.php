@@ -2,11 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Brand;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
 /**
- * A product with its full content, gallery and specifications, for the product page.
+ * A product with its full content, gallery, specifications, brand and downloadable
+ * documents, for the product page.
  *
  * @mixin Product
  */
@@ -28,6 +30,10 @@ class ProductDetailResource extends ProductResource
                 $this->getMedia(Product::MAIN_IMAGE_COLLECTION)->concat($this->getMedia(Product::GALLERY_COLLECTION)),
             )->resolve($request)),
             'specifications' => ProductSpecificationResource::collection($this->whenLoaded('specifications')),
+            'brand' => $this->whenLoaded('brand', fn (Brand $brand): array => BrandResource::make($brand)->resolve($request)),
+            'documents' => $this->whenLoaded('media', fn (): array => DocumentResource::collection(
+                $this->getMedia(Product::DOCUMENTS_COLLECTION),
+            )->resolve($request)),
         ];
     }
 }

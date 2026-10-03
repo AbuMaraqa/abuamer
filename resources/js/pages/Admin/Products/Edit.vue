@@ -9,6 +9,7 @@ import { useTranslations } from '../../../composables/useTranslations';
 defineProps({
     product: { type: Object, required: true },
     categories: { type: Array, required: true },
+    brands: { type: Array, required: true },
 });
 
 const { t } = useTranslations();
@@ -21,7 +22,7 @@ const deleting = ref(null);
 
     <PageHeader :title="product[locale]?.name || t('Edit product')" :eyebrow="t('Edit product')" />
 
-    <ProductForm :product="product" :categories="categories" @delete="deleting = { id: product.id, name: product[locale]?.name }" />
+    <ProductForm :product="product" :categories="categories" :brands="brands" @delete="deleting = { id: product.id, name: product[locale]?.name }" />
 
     <ProductDeleteDialog :product="deleting" @close="deleting = null" />
 </template>

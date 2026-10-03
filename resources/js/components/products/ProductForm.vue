@@ -1,6 +1,6 @@
 <script setup>
 import { useForm, usePage } from '@inertiajs/vue3';
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { route } from 'ziggy-js';
 import { slugify } from '../../composables/useCategoryTree';
 import { useTranslations } from '../../composables/useTranslations';
@@ -10,20 +10,23 @@ import Icon from '../common/Icon.vue';
 import FormField from '../form/FormField.vue';
 import LocaleHeading from '../form/LocaleHeading.vue';
 import ImageUpload from '../form/ImageUpload.vue';
+import SelectInput from '../form/SelectInput.vue';
 import TextareaInput from '../form/TextareaInput.vue';
 import TextInput from '../form/TextInput.vue';
 import ToggleSwitch from '../form/ToggleSwitch.vue';
+import DocumentManager from './DocumentManager.vue';
 import GalleryManager from './GalleryManager.vue';
 import ProductSpecificationsEditor from './ProductSpecificationsEditor.vue';
 
 /**
  * Create or edit a product. The form always submits the complete desired state
- * (translations, ordered specifications, kept gallery images and new uploads).
+ * (translations, ordered specifications, kept gallery images and documents, new uploads).
  */
 const props = defineProps({
     product: { type: Object, default: null },
     categories: { type: Array, required: true },
     categoryId: { type: Number, default: null },
+    brands: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits(['delete']);
@@ -34,6 +37,7 @@ const translatedFields = ['name', 'slug', 'short_description', 'description', 's
 
 const form = useForm({
     category_id: props.product?.category_id ?? props.categoryId,
+    brand_id: props.product?.brand_id ?? null,
     sku: props.product?.sku ?? '',
     status: props.product?.status ?? true,
     featured: props.product?.featured ?? false,
@@ -44,10 +48,17 @@ const form = useForm({
     main_image: null,
     remove_main_image: false,
     gallery_uploads: [],
+    document_uploads: [],
 });
 
 const specifications = ref((props.product?.specifications ?? []).map((specification) => ({ ...specification })));
 const galleryImages = ref([...(props.product?.gallery ?? [])]);
+const documents = ref([...(props.product?.documents ?? [])]);
+
+const brandOptions = computed(() => [
+    { value: null, label: t('No brand') },
+    ...props.brands.map((brand) => ({ value: brand.id, label: brand.status ? brand.name : `${brand.name} (${t('Hidden')})` })),
+]);
 const slugTouched = reactive(Object.fromEntries(locales.map(({ code }) => [code, !!props.product?.[code]?.slug])));
 
 function updateName(locale, name) {
@@ -71,6 +82,7 @@ function submit() {
             ...Object.fromEntries(locales.map(({ code }) => [code, translations[code]])),
         })),
         gallery: galleryImages.value.map((image) => image.id),
+        documents: documents.value.map((document) => document.id),
         ...(props.product ? { _method: 'put' } : {}),
     }));
 
@@ -149,6 +161,12 @@ function submit() {
                 </div>
             </section>
 
+            <section class="rounded-2xl border border-line bg-white p-5 sm:p-6">
+                <h2 class="text-base font-semibold text-ink">{{ t('Downloads') }}</h2>
+                <p class="mt-1 mb-5 text-xs text-muted">{{ t('Offered for download on the product page, in this order.') }}</p>
+                <DocumentManager v-model:documents="documents" v-model:uploads="form.document_uploads" :errors="form.errors" />
+            </section>
+
             <details class="rounded-2xl border border-line bg-white p-5 sm:p-6">
                 <summary class="cursor-pointer list-none text-base font-semibold text-ink">
                     {{ t('Search engine optimisation') }}
@@ -173,6 +191,13 @@ function submit() {
             <section class="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 sm:p-6">
                 <FormField :label="t('Category')" for="category" :error="form.errors.category_id" required>
                     <CategoryTreeSelect id="category" v-model="form.category_id" :nodes="categories" :invalid="!!form.errors.category_id" />
+                </FormField>
+
+                <FormField :label="t('Brand')" for="brand" :error="form.errors.brand_id">
+                    <SelectInput id="brand" v-model="form.brand_id" :options="brandOptions" />
+                    <a v-if="brands.length === 0 && $page.props.auth.user.can['brands.manage']" :href="route('admin.brands.create')" class="text-xs text-brass-700 hover:underline">
+                        {{ t('Add your first brand') }}
+                    </a>
                 </FormField>
 
                 <FormField :label="t('Code (SKU)')" for="sku" :error="form.errors.sku">

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\BrandReorderController;
+use App\Http\Controllers\Admin\BrandStatusController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CategoryMoveController;
 use App\Http\Controllers\Admin\CategoryReorderController;
@@ -35,6 +38,11 @@ Route::resource('categories', CategoryController::class)->except('show');
 
 Route::patch('products/category', ProductCategoryController::class)->name('products.category');
 Route::resource('products', ProductController::class)->except('show');
+
+// Registered before the resource so "reorder" is not captured as a {brand} binding.
+Route::patch('brands/reorder', BrandReorderController::class)->name('brands.reorder');
+Route::patch('brands/{brand}/status', BrandStatusController::class)->name('brands.status');
+Route::resource('brands', BrandController::class)->except('show');
 
 // Registered before the resource so "reorder" is not captured as a {slide} binding.
 Route::patch('slides/reorder', SlideReorderController::class)->name('slides.reorder');

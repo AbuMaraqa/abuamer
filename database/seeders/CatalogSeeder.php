@@ -5,21 +5,25 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Product;
 use App\Support\Slug;
+use Database\Seeders\Concerns\GeneratesDemoImages;
 use Illuminate\Database\Seeder;
 
 /**
- * Demo catalog for local development: the example category tree from the project
- * brief, in Arabic and English, with a few products and specifications.
+ * Demo catalog for local development: the tiles and marble department from the project
+ * brief, in Arabic and English, with a few products and specifications. The sanitary
+ * ware department is seeded by SanitaryWareSeeder.
  */
 class CatalogSeeder extends Seeder
 {
+    use GeneratesDemoImages;
+
     /**
      * Each node: [English name, Arabic name, children].
      *
      * @var list<array{0: string, 1: string, 2: array<int, mixed>}>
      */
     private const array TREE = [
-        ['Tiles', 'بلاط', [
+        ['Tiles & Marble', 'البلاط والرخام', [
             ['Porcelain', 'بورسلان', [
                 ['Marble Effect', 'تأثير الرخام', [
                     ['Calacatta', 'كالاكاتا', [
@@ -90,6 +94,11 @@ class CatalogSeeder extends Seeder
         $categoriesByName = [];
         $this->createNodes(self::TREE, null, $categoriesByName);
 
+        $categoriesByName['Tiles & Marble']
+            ->addMedia($this->tileTexture([58, 50, 41], [214, 202, 184], 11))
+            ->usingFileName('tiles-and-marble.jpg')
+            ->toMediaCollection(Category::IMAGE_COLLECTION);
+
         foreach (self::PRODUCTS as $categoryName => $products) {
             foreach ($products as $position => $product) {
                 $this->createProduct($categoriesByName[$categoryName], $product, $position + 1);
@@ -108,8 +117,8 @@ class CatalogSeeder extends Seeder
                 'parent_id' => $parent?->id,
                 'status' => true,
                 'sort_order' => $position + 1,
-                'ar' => ['name' => $arabic, 'slug' => Slug::make($arabic, 'ar'), 'description' => "مجموعة {$arabic} من نُسق للبلاط والسيراميك."],
-                'en' => ['name' => $english, 'slug' => Slug::make($english, 'en'), 'description' => "The {$english} collection by Nasaq Tiles & Ceramics."],
+                'ar' => ['name' => $arabic, 'slug' => Slug::make($arabic, 'ar'), 'description' => "مجموعة {$arabic} المختارة من نُسق."],
+                'en' => ['name' => $english, 'slug' => Slug::make($english, 'en'), 'description' => "The {$english} collection, selected by Nasaq."],
             ]);
 
             $categoriesByName[$english] = $category;

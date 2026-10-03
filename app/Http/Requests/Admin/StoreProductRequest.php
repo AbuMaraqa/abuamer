@@ -12,8 +12,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 
 /**
- * The form always submits the complete desired state of a product: translations,
- * the ordered list of specifications, and the ordered list of gallery images to keep.
+ * The form always submits the complete desired state of a product: translations, the
+ * ordered list of specifications, and the ordered lists of gallery images and documents to keep.
  */
 class StoreProductRequest extends FormRequest
 {
@@ -22,6 +22,11 @@ class StoreProductRequest extends FormRequest
     private const array TRANSLATED_FIELDS = ['name', 'slug', 'short_description', 'description', 'seo_title', 'seo_description'];
 
     private const array IMAGE_RULES = ['image', 'mimes:jpg,jpeg,png,webp', 'max:8192', 'dimensions:min_width=600,min_height=600'];
+
+    /**
+     * Data sheets, installation guides and catalogues; 10 MB is the media library's limit.
+     */
+    private const array DOCUMENT_RULES = ['file', 'mimes:pdf', 'max:10240'];
 
     /**
      * Determine if the user is authorized to make this request.
@@ -64,6 +69,7 @@ class StoreProductRequest extends FormRequest
     {
         $rules = [
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')],
+            'brand_id' => ['nullable', 'integer', Rule::exists('brands', 'id')],
             'sku' => ['nullable', 'string', 'max:64', 'regex:/^[A-Z0-9][A-Z0-9._\-\/]*$/', Rule::unique('products', 'sku')->ignore($this->ignoredProductId())],
             'status' => ['required', 'boolean'],
             'featured' => ['required', 'boolean'],
@@ -75,6 +81,10 @@ class StoreProductRequest extends FormRequest
             'gallery.*' => ['integer', 'distinct'],
             'gallery_uploads' => ['array', 'max:20'],
             'gallery_uploads.*' => self::IMAGE_RULES,
+            'documents' => ['array'],
+            'documents.*' => ['integer', 'distinct'],
+            'document_uploads' => ['array', 'max:10'],
+            'document_uploads.*' => self::DOCUMENT_RULES,
 
             'specifications' => ['array', 'max:50'],
             'specifications.*.id' => ['nullable', 'integer'],
@@ -121,6 +131,8 @@ class StoreProductRequest extends FormRequest
         $attributes = [
             'sku' => __('Code (SKU)'),
             'gallery_uploads.*' => __('Gallery image'),
+            'brand_id' => __('Brand'),
+            'document_uploads.*' => __('File'),
         ];
 
         foreach ($this->locales() as $locale) {
@@ -144,6 +156,7 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'category_id' => $this->integer('category_id'),
+            'brand_id' => $this->integer('brand_id') ?: null,
             'sku' => $this->validated('sku'),
             'status' => $this->boolean('status'),
             'featured' => $this->boolean('featured'),
@@ -207,6 +220,24 @@ class StoreProductRequest extends FormRequest
     public function galleryUploads(): array
     {
         return array_values($this->file('gallery_uploads', []));
+    }
+
+    /**
+     * Ids of existing documents to keep, in display order.
+     *
+     * @return list<int>
+     */
+    public function documentIds(): array
+    {
+        return array_map('intval', $this->validated('documents', []));
+    }
+
+    /**
+     * @return list<UploadedFile>
+     */
+    public function documentUploads(): array
+    {
+        return array_values($this->file('document_uploads', []));
     }
 
     protected function ignoredProductId(): ?int

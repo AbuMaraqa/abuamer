@@ -17,7 +17,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-#[Fillable(['category_id', 'sku', 'status', 'featured', 'sort_order'])]
+#[Fillable(['category_id', 'brand_id', 'sku', 'status', 'featured', 'sort_order'])]
 class Product extends Model implements HasMedia, TranslatableContract
 {
     /** @use HasFactory<ProductFactory> */
@@ -26,6 +26,11 @@ class Product extends Model implements HasMedia, TranslatableContract
     public const string MAIN_IMAGE_COLLECTION = 'product_main_image';
 
     public const string GALLERY_COLLECTION = 'product_gallery';
+
+    /**
+     * Downloadable PDF files: technical data sheets, installation guides, catalogues.
+     */
+    public const string DOCUMENTS_COLLECTION = 'product_documents';
 
     /**
      * @var list<string>
@@ -47,6 +52,7 @@ class Product extends Model implements HasMedia, TranslatableContract
     {
         return [
             'category_id' => 'integer',
+            'brand_id' => 'integer',
             'status' => 'boolean',
             'featured' => 'boolean',
             'sort_order' => 'integer',
@@ -59,6 +65,14 @@ class Product extends Model implements HasMedia, TranslatableContract
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * @return BelongsTo<Brand, $this>
+     */
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
     }
 
     /**
@@ -106,6 +120,15 @@ class Product extends Model implements HasMedia, TranslatableContract
         });
     }
 
+    /**
+     * Eager load the brand for public pages, where a hidden brand is not named.
+     */
+    #[Scope]
+    protected function withVisibleBrand(Builder $query): void
+    {
+        $query->with(['brand' => fn (BelongsTo $brand) => $brand->where('status', true)]);
+    }
+
     #[Scope]
     protected function ordered(Builder $query): void
     {
@@ -120,6 +143,9 @@ class Product extends Model implements HasMedia, TranslatableContract
 
         $this->addMediaCollection(self::GALLERY_COLLECTION)
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+
+        $this->addMediaCollection(self::DOCUMENTS_COLLECTION)
+            ->acceptsMimeTypes(['application/pdf']);
     }
 
     public function registerMediaConversions(?Media $media = null): void

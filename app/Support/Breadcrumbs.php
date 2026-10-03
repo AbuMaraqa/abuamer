@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTree;
@@ -38,6 +39,28 @@ final class Breadcrumbs
                     'url' => route('products.category', ['path' => $tree->slugPath($node->id, $locale)]),
                 ])
                 ->all(),
+        ];
+    }
+
+    /**
+     * @return list<array{label: string, url: string|null}>
+     */
+    public static function forBrands(): array
+    {
+        return [
+            ['label' => __('Home'), 'url' => route('home')],
+            ['label' => __('Brands'), 'url' => route('brands.index')],
+        ];
+    }
+
+    /**
+     * @return list<array{label: string, url: string|null}>
+     */
+    public static function forBrand(Brand $brand): array
+    {
+        return [
+            ...self::forBrands(),
+            ['label' => $brand->name, 'url' => route('brands.show', ['brand' => $brand->slug])],
         ];
     }
 

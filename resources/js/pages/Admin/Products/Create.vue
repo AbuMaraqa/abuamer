@@ -7,6 +7,7 @@ import { useTranslations } from '../../../composables/useTranslations';
 defineProps({
     categories: { type: Array, required: true },
     categoryId: { type: Number, default: null },
+    brands: { type: Array, required: true },
 });
 
 const { t } = useTranslations();
@@ -17,5 +18,5 @@ const { t } = useTranslations();
 
     <PageHeader :title="t('Add product')" :eyebrow="t('Products')" />
 
-    <ProductForm :categories="categories" :category-id="categoryId" />
+    <ProductForm :categories="categories" :category-id="categoryId" :brands="brands" />
 </template>

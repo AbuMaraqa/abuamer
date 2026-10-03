@@ -24,7 +24,7 @@ class CompanyHighlight extends Model implements TranslatableContract
     /**
      * Icons available for "why choose us" features (rendered by the Vue Icon component).
      */
-    public const array FEATURE_ICONS = ['gem', 'award', 'ruler', 'truck', 'shield', 'sparkles', 'layers', 'leaf', 'palette', 'users'];
+    public const array FEATURE_ICONS = ['gem', 'award', 'ruler', 'truck', 'shield', 'sparkles', 'layers', 'leaf', 'palette', 'users', 'droplet', 'bath'];
 
     /**
      * @var list<string>

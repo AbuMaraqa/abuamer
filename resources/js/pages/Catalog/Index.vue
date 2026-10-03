@@ -9,6 +9,7 @@ import { useTranslations } from '../../composables/useTranslations';
 
 defineProps({
     categories: { type: Array, required: true },
+    brands: { type: Array, required: true },
     products: { type: Object, required: true },
     filters: { type: Object, required: true },
     breadcrumbs: { type: Array, required: true },
@@ -25,7 +26,7 @@ const { t } = useTranslations();
             <p class="eyebrow">{{ t('Collections') }}</p>
             <h1 class="mt-3 font-display text-4xl leading-tight text-ink sm:text-5xl lg:text-6xl">{{ t('Products') }}</h1>
             <p class="mt-4 text-base leading-relaxed text-muted">
-                {{ t('Explore our collections of porcelain, ceramic and natural-effect tiles for every space.') }}
+                {{ t('Explore our collections of tiles, marble and sanitary ware for every space.') }}
             </p>
         </div>
 
@@ -39,7 +40,7 @@ const { t } = useTranslations();
                     <h2 class="font-display text-3xl text-ink sm:text-4xl">{{ t('All products') }}</h2>
                     <p class="mt-2 text-sm text-muted" aria-live="polite">{{ t(':count products', { count: products.meta.total }) }}</p>
                 </div>
-                <ProductFilters :filters="filters" :url="route('products.index')" />
+                <ProductFilters :filters="filters" :url="route('products.index')" :brands="brands" />
             </div>
 
             <ProductGrid :products="products.data" />

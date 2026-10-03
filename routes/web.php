@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
@@ -28,6 +29,9 @@ Route::group([
         Route::get('products', [ProductController::class, 'index'])->name('products.index');
         Route::get('products/{path}', [CategoryController::class, 'show'])->where('path', '.+')->name('products.category');
         Route::get('product/{slug}', [ProductController::class, 'show'])->name('products.show');
+
+        Route::get('brands', [BrandController::class, 'index'])->name('brands.index');
+        Route::get('brands/{brand:slug}', [BrandController::class, 'show'])->name('brands.show');
     });
 
     Route::middleware('guest')->group(function () {

@@ -4,7 +4,9 @@ import { route } from 'ziggy-js';
 import CategoryGrid from '../components/category/CategoryGrid.vue';
 import Icon from '../components/common/Icon.vue';
 import ProductGrid from '../components/products/ProductGrid.vue';
+import BrandStrip from '../components/sections/BrandStrip.vue';
 import CtaSection from '../components/sections/CtaSection.vue';
+import DepartmentShowcase from '../components/sections/DepartmentShowcase.vue';
 import FeatureGrid from '../components/sections/FeatureGrid.vue';
 import HeroSlider from '../components/sections/HeroSlider.vue';
 import SectionHeading from '../components/sections/SectionHeading.vue';
@@ -14,8 +16,10 @@ import { useTranslations } from '../composables/useTranslations';
 defineProps({
     company: { type: Object, required: true },
     slides: { type: Array, required: true },
+    departments: { type: Array, required: true },
     collections: { type: Array, required: true },
     featuredProducts: { type: Array, required: true },
+    brands: { type: Array, required: true },
     features: { type: Array, required: true },
     statistics: { type: Array, required: true },
 });
@@ -61,6 +65,18 @@ const { t } = useTranslations();
         </div>
     </section>
 
+    <!-- Departments: the main product lines, when the catalog has several -->
+    <section v-if="departments.length > 0" class="mx-auto max-w-7xl px-4 pt-16 sm:px-6 sm:pt-24 lg:px-8 lg:pt-28">
+        <SectionHeading :eyebrow="t('Our departments')" :title="t('Everything for your home, under one roof')">
+            <Link :href="route('products.index')" class="inline-flex items-center gap-2 text-sm font-medium text-ink hover:text-brass-700">
+                {{ t('All products') }}
+                <Icon name="arrow-right" :size="16" />
+            </Link>
+        </SectionHeading>
+
+        <DepartmentShowcase class="mt-8 sm:mt-12" :departments="departments" />
+    </section>
+
     <!-- About -->
     <section v-if="company.introduction" class="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:gap-14 sm:px-6 sm:py-24 lg:grid-cols-2 lg:gap-20 lg:px-8 lg:py-32">
         <div class="relative">
@@ -89,8 +105,8 @@ const { t } = useTranslations();
         </div>
     </section>
 
-    <!-- Collections -->
-    <section v-if="collections.length > 0" class="border-y border-line bg-white">
+    <!-- Collections, when the catalog is a single product line -->
+    <section v-if="departments.length === 0 && collections.length > 0" class="border-y border-line bg-white">
         <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
             <SectionHeading :eyebrow="t('Collections')" :title="t('Designed for every space')">
                 <Link :href="route('products.index')" class="inline-flex items-center gap-2 text-sm font-medium text-ink hover:text-brass-700">
@@ -107,6 +123,20 @@ const { t } = useTranslations();
     <section v-if="featuredProducts.length > 0" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <SectionHeading :eyebrow="t('Featured')" :title="t('Selected for you')" />
         <ProductGrid class="mt-8 sm:mt-12" :products="featuredProducts" />
+    </section>
+
+    <!-- Brands -->
+    <section v-if="brands.length > 0" class="border-t border-line bg-white">
+        <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+            <SectionHeading :eyebrow="t('Our partners')" :title="t('Brands we carry')">
+                <Link :href="route('brands.index')" class="inline-flex items-center gap-2 text-sm font-medium text-ink hover:text-brass-700">
+                    {{ t('All brands') }}
+                    <Icon name="arrow-right" :size="16" />
+                </Link>
+            </SectionHeading>
+
+            <BrandStrip class="mt-8 sm:mt-12" :brands="brands" />
+        </div>
     </section>
 
     <!-- Why Nasaq + statistics -->

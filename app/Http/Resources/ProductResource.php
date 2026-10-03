@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Brand;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTreeService;
 use Illuminate\Http\Request;
@@ -33,6 +34,12 @@ class ProductResource extends JsonResource
             'status' => $this->status,
             'featured' => $this->featured,
             'category' => $category ? ['id' => $category->id, 'name' => $category->name] : null,
+            // Public pages load only visible brands, so a hidden brand is not named.
+            'brand' => $this->whenLoaded('brand', fn (Brand $brand): array => [
+                'id' => $brand->id,
+                'name' => $brand->name,
+                'url' => route('brands.show', ['brand' => $brand->slug]),
+            ]),
             'image' => $this->whenLoaded('media', fn (): ?array => $this->coverImage($request)),
         ];
     }

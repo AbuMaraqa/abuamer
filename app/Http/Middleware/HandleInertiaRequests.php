@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Enums\Permission;
 use App\Http\Resources\CategoryResource;
+use App\Models\Brand;
 use App\Models\Company;
 use App\Models\ContactMessage;
 use App\Models\User;
@@ -135,6 +136,8 @@ class HandleInertiaRequests extends Middleware
             'navigation' => CategoryResource::collection(
                 $tree->nested($tree->collectionsParentId(), activeOnly: true, maxDepth: 2),
             )->resolve(),
+            // The brands page is linked from the menus once there is a brand to show.
+            'hasBrands' => Brand::query()->active()->exists(),
         ];
     }
 

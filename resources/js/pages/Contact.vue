@@ -54,7 +54,7 @@ function submit() {
         <p class="eyebrow">{{ t('Contact') }}</p>
         <h1 class="mt-4 max-w-3xl font-display text-4xl leading-tight text-balance text-ink sm:text-6xl">{{ t('Let’s talk about your project') }}</h1>
         <p class="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:mt-5 sm:text-lg">
-            {{ t('Our team will help you choose the right tiles, sizes and finishes for your space.') }}
+            {{ t('Our team will help you choose the right tiles, sanitary ware and finishes for your project.') }}
         </p>
     </section>
 

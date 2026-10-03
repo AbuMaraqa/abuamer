@@ -44,6 +44,7 @@ const year = new Date().getFullYear();
                 <ul class="flex flex-col gap-1.5 text-sm sm:gap-2">
                     <li><Link :href="route('about')" class="inline-block py-1 transition-colors hover:text-white">{{ $t('About us') }}</Link></li>
                     <li><Link :href="route('products.index')" class="inline-block py-1 transition-colors hover:text-white">{{ $t('Products') }}</Link></li>
+                    <li v-if="$page.props.site.hasBrands"><Link :href="route('brands.index')" class="inline-block py-1 transition-colors hover:text-white">{{ $t('Brands') }}</Link></li>
                     <li><Link :href="route('contact')" class="inline-block py-1 transition-colors hover:text-white">{{ $t('Contact') }}</Link></li>
                 </ul>
             </nav>

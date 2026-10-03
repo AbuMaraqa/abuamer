@@ -28,9 +28,10 @@ const isTransparent = computed(() => page.component === 'Home' && !isScrolled.va
 
 const links = computed(() => [
     { label: 'Home', href: route('home'), active: route().current('home') },
+    page.props.site.hasBrands && { label: 'Brands', href: route('brands.index'), active: route().current('brands.*') },
     { label: 'About us', href: route('about'), active: route().current('about') },
     { label: 'Contact', href: route('contact'), active: route().current('contact') },
-]);
+].filter(Boolean));
 
 const isProductsActive = computed(() => route().current('products.*'));
 

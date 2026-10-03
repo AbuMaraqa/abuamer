@@ -17,47 +17,57 @@ use Illuminate\Database\Seeder;
 class CompanySeeder extends Seeder
 {
     /**
+     * The company texts in Arabic and English.
+     *
+     * @var array<string, array<string, string>>
+     */
+    private const array TEXTS = [
+        'ar' => [
+            'name' => 'نُسق للبلاط والأدوات الصحية',
+            'tagline' => 'بلاط ورخام وأدوات صحية لمساحات استثنائية',
+            'hero_title' => 'تفاصيل معمارية تصنع الفرق',
+            'hero_subtitle' => 'من البورسلان والرخام إلى المغاسل والخلاطات وأنظمة الدش، مجموعات مختارة من أفضل العلامات العالمية للمشاريع السكنية والتجارية.',
+            'introduction' => 'منذ تأسيسها، تقدم نُسق حلولًا متكاملة للأرضيات والجدران والحمامات والمطابخ، تجمع بين البلاط والرخام الفاخر والأدوات الصحية من أفضل العلامات العالمية.',
+            'story' => "بدأت نُسق بمعرض صغير للبلاط وشغف كبير بالتفاصيل.\n\nومع نمو مشاريع عملائنا أضفنا قسمًا متكاملًا للأدوات الصحية، ليجد المصمم والمقاول وصاحب المنزل كل ما يحتاجه تحت سقف واحد: من بلاط الأرضيات والجدران إلى المراحيض المعلّقة والمغاسل والخلاطات وأنظمة الدش، من الفلل الخاصة إلى الفنادق والمشاريع التجارية الكبرى.",
+            'vision' => 'أن نكون الوجهة الأولى للبلاط والأدوات الصحية الفاخرة في المنطقة.',
+            'mission' => 'تقديم منتجات عالية الجودة من علامات موثوقة، وخدمة استشارية تساعد عملاءنا على تنسيق كل تفاصيل مساحاتهم.',
+            'cta_title' => 'لنصمم مساحتك القادمة معًا',
+            'cta_text' => 'زر معرضنا أو تواصل معنا، وسيساعدك فريقنا في اختيار البلاط والأدوات الصحية المناسبة لمشروعك.',
+        ],
+        'en' => [
+            'name' => 'Nasaq Tiles & Sanitary Ware',
+            'tagline' => 'Tiles, marble and sanitary ware for exceptional spaces',
+            'hero_title' => 'Architectural details that make the difference',
+            'hero_subtitle' => 'From porcelain and marble to basins, mixers and shower systems: curated collections from leading international brands for residential and commercial projects.',
+            'introduction' => 'Since its founding, Nasaq has delivered complete solutions for floors, walls, bathrooms and kitchens, bringing premium tiles and marble together with sanitary ware from the world’s leading brands.',
+            'story' => "Nasaq started as a small tile showroom with a great passion for detail.\n\nAs our clients’ projects grew, we added a complete sanitary ware department, so designers, contractors and homeowners find everything under one roof: from floor and wall tiles to wall-hung toilets, basins, mixers and shower systems, for private villas, hotels and large commercial projects alike.",
+            'vision' => 'To be the first destination for premium tiles and sanitary ware in the region.',
+            'mission' => 'To offer high-quality products from trusted brands, and expert advice that helps our clients bring every detail of their spaces together.',
+            'cta_title' => 'Let’s design your next space together',
+            'cta_text' => 'Visit our showroom or get in touch, and our team will help you choose the right tiles and sanitary ware for your project.',
+        ],
+    ];
+
+    /**
      * Run the database seeds.
      */
     public function run(): void
     {
         Company::current()->fill([
             'founded_year' => 2008,
-            'ar' => [
-                'name' => 'نُسق للبلاط والسيراميك',
-                'tagline' => 'بلاط فاخر لمساحات استثنائية',
-                'hero_title' => 'تفاصيل معمارية تصنع الفرق',
-                'hero_subtitle' => 'مجموعات مختارة من البورسلان والسيراميك والأحجار الطبيعية للمشاريع السكنية والتجارية.',
-                'introduction' => 'منذ تأسيسها، تقدم نُسق للبلاط والسيراميك حلولًا متكاملة للأرضيات والجدران تجمع بين الجودة العالية والتصميم المعاصر.',
-                'story' => "بدأت نُسق بمعرض صغير وشغف كبير بالتفاصيل.\n\nواليوم نعمل مع مصممين ومقاولين وأصحاب منازل لاختيار البلاط المناسب لكل مساحة، من الفلل الخاصة إلى الفنادق والمشاريع التجارية الكبرى.",
-                'vision' => 'أن نكون الوجهة الأولى للبلاط الفاخر في المنطقة.',
-                'mission' => 'تقديم منتجات عالية الجودة وخدمة استشارية تساعد عملاءنا على تحقيق رؤيتهم المعمارية.',
-                'cta_title' => 'لنصمم مساحتك القادمة معًا',
-                'cta_text' => 'زر معرضنا أو تواصل معنا، وسيساعدك فريقنا في اختيار البلاط المناسب لمشروعك.',
-            ],
-            'en' => [
-                'name' => 'Nasaq Tiles & Ceramics',
-                'tagline' => 'Premium tiles for exceptional spaces',
-                'hero_title' => 'Architectural details that make the difference',
-                'hero_subtitle' => 'Curated collections of porcelain, ceramic and natural stone for residential and commercial projects.',
-                'introduction' => 'Since its founding, Nasaq Tiles & Ceramics has delivered complete flooring and wall solutions that combine high quality with contemporary design.',
-                'story' => "Nasaq started as a small showroom with a great passion for detail.\n\nToday we work with designers, contractors and homeowners to choose the right tiles for every space, from private villas to hotels and large commercial projects.",
-                'vision' => 'To be the first destination for premium tiles in the region.',
-                'mission' => 'To offer high-quality products and expert advice that help our clients realise their architectural vision.',
-                'cta_title' => 'Let’s design your next space together',
-                'cta_text' => 'Visit our showroom or get in touch, and our team will help you choose the right tiles for your project.',
-            ],
+            'ar' => self::TEXTS['ar'],
+            'en' => self::TEXTS['en'],
         ])->save();
 
         $highlights = [
             [HighlightType::Value, null, null, ['الجودة', 'Quality'], ['نختار خاماتنا من أفضل المصانع العالمية.', 'We source from the finest manufacturers worldwide.']],
             [HighlightType::Value, null, null, ['الأصالة', 'Integrity'], ['نلتزم بالشفافية في كل تعامل.', 'We are transparent in every interaction.']],
             [HighlightType::Value, null, null, ['الابتكار', 'Innovation'], ['نواكب أحدث اتجاهات التصميم.', 'We follow the latest design trends.']],
-            [HighlightType::Feature, 'gem', null, ['خامات فاخرة', 'Premium materials'], ['بورسلان وسيراميك بمواصفات عالمية.', 'Porcelain and ceramics to international standards.']],
-            [HighlightType::Feature, 'palette', null, ['تشكيلة واسعة', 'Wide selection'], ['مئات التصاميم والمقاسات والتشطيبات.', 'Hundreds of designs, sizes and finishes.']],
-            [HighlightType::Feature, 'users', null, ['استشارات متخصصة', 'Expert advice'], ['فريق يساعدك على اختيار الأنسب لمشروعك.', 'A team that helps you choose the best fit.']],
+            [HighlightType::Feature, 'gem', null, ['خامات فاخرة', 'Premium materials'], ['بورسلان ورخام وأدوات صحية بمواصفات عالمية.', 'Porcelain, marble and sanitary ware to international standards.']],
+            [HighlightType::Feature, 'palette', null, ['تشكيلة واسعة', 'Wide selection'], ['مئات التصاميم من البلاط والمغاسل والخلاطات.', 'Hundreds of tiles, basins and mixers to choose from.']],
+            [HighlightType::Feature, 'users', null, ['استشارات متخصصة', 'Expert advice'], ['فريق يساعدك على تنسيق البلاط مع الأدوات الصحية المناسبة.', 'A team that helps you match tiles with the right sanitary ware.']],
             [HighlightType::Feature, 'truck', null, ['توصيل موثوق', 'Reliable delivery'], ['توصيل منظم في الوقت المحدد.', 'Organised, on-time delivery.']],
-            [HighlightType::Feature, 'shield', null, ['ضمان الجودة', 'Quality guarantee'], ['منتجات مضمونة ومطابقة للمواصفات.', 'Guaranteed products that meet specifications.']],
+            [HighlightType::Feature, 'shield', null, ['ضمان الجودة', 'Quality guarantee'], ['منتجات أصلية بضمان الشركة المصنّعة.', 'Genuine products with the manufacturer’s warranty.']],
             [HighlightType::Feature, 'ruler', null, ['حلول للمشاريع', 'Project solutions'], ['كميات وتوريدات للمشاريع الكبرى.', 'Volumes and supply for large projects.']],
             [HighlightType::Statistic, null, '15+', ['عامًا من الخبرة', 'Years of experience'], [null, null]],
             [HighlightType::Statistic, null, '1200+', ['منتج', 'Products'], [null, null]],
@@ -92,10 +102,10 @@ class CompanySeeder extends Seeder
         ])->save();
 
         app(SeoSettings::class)->fill([
-            'meta_title' => ['ar' => 'نُسق للبلاط والسيراميك | بلاط وبورسلان فاخر', 'en' => 'Nasaq Tiles & Ceramics | Premium tiles and porcelain'],
+            'meta_title' => ['ar' => 'نُسق للبلاط والأدوات الصحية | بلاط ورخام وأدوات صحية فاخرة', 'en' => 'Nasaq Tiles & Sanitary Ware | Premium tiles, marble and sanitary ware'],
             'meta_description' => [
-                'ar' => 'اكتشف مجموعات نُسق من البورسلان والسيراميك وبلاط الجدران والأرضيات للمشاريع السكنية والتجارية.',
-                'en' => 'Discover Nasaq’s collections of porcelain, ceramic, wall and floor tiles for residential and commercial projects.',
+                'ar' => 'اكتشف مجموعات نُسق من البورسلان والرخام وبلاط الجدران والأرضيات، والأدوات الصحية والخلاطات وأنظمة الدش من أفضل العلامات العالمية.',
+                'en' => 'Discover Nasaq’s collections of porcelain, marble, wall and floor tiles, plus sanitary ware, mixers and shower systems from leading international brands.',
             ],
         ])->save();
     }

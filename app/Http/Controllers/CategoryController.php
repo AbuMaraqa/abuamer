@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BrandResource;
 use App\Http\Resources\CategoryDetailResource;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTreeService;
@@ -33,11 +35,17 @@ class CategoryController extends Controller
             ? $tree->subtreeIds($category->id, activeOnly: true)
             : [$category->id];
 
+        // Only brands with products in this listing are offered, so a filter never comes up empty.
+        $brands = Brand::query()->active()->withProductsIn($productCategoryIds)->ordered()->get();
+        $brand = $brands->firstWhere('slug', $request->string('brand')->value());
+
         $products = Product::query()
             ->active()
             ->inCategories($productCategoryIds)
+            ->when($brand, fn (Builder $query, Brand $brand) => $query->where('brand_id', $brand->id))
             ->when($request->string('q')->trim()->value(), fn (Builder $query, string $term) => $query->search($term))
             ->with(['translations', 'media'])
+            ->withVisibleBrand()
             ->ordered()
             ->paginate(config('catalog.per_page'))
             ->withQueryString();
@@ -58,13 +66,17 @@ class CategoryController extends Controller
                 ->description($detail->seo_description ?: $detail->description)
                 ->image($detail->getFirstMedia(Category::IMAGE_COLLECTION)?->getAvailableFullUrl(['large']))
                 ->alternates($localeUrls)
-                ->noindex($request->filled('q'))
+                ->noindex($request->filled('q') || $request->filled('brand'))
                 ->withStructuredData(StructuredData::breadcrumbs($breadcrumbs)),
             'category' => CategoryDetailResource::make($detail),
             'children' => CategoryResource::collection($tree->children($category->id)->filter->status->values()->load('media')),
             'relatedCategories' => CategoryResource::collection($relatedCategories->load('media')),
+            'brands' => BrandResource::collection($brands),
             'products' => ProductResource::collection($products),
-            'filters' => ['q' => $request->string('q')->trim()->value()],
+            'filters' => [
+                'q' => $request->string('q')->trim()->value(),
+                'brand' => $brand?->slug,
+            ],
             'breadcrumbs' => $breadcrumbs,
             'localeUrls' => $localeUrls,
         ]);

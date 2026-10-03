@@ -8,7 +8,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
- * Applies the image state submitted by a control panel form to a media collection.
+ * Applies the image or file state submitted by a control panel form to a media collection.
  */
 final class MediaSync
 {

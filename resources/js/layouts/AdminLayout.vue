@@ -19,6 +19,7 @@ const navigation = [
     { label: 'Dashboard', icon: 'layout', routeName: 'admin.dashboard', active: 'admin.dashboard' },
     { label: 'Categories', icon: 'folder-tree', routeName: 'admin.categories.index', active: 'admin.categories.*', permission: 'categories.view' },
     { label: 'Products', icon: 'box', routeName: 'admin.products.index', active: 'admin.products.*', permission: 'products.view' },
+    { label: 'Brands', icon: 'tag', routeName: 'admin.brands.index', active: 'admin.brands.*', permission: 'brands.manage' },
     { label: 'Slider', icon: 'image', routeName: 'admin.slides.index', active: 'admin.slides.*', permission: 'company.manage' },
     { label: 'Company', icon: 'building', routeName: 'admin.company.edit', active: 'admin.company.*', permission: 'company.manage' },
     { label: 'Messages', icon: 'mail', routeName: 'admin.messages.index', active: 'admin.messages.*', permission: 'messages.manage', badge: 'unreadMessages' },

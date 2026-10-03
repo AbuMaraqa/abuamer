@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTree;
 use App\Services\Catalog\CategoryTreeService;
@@ -53,6 +54,18 @@ class SeoController extends Controller
         }
 
         $visibleIds = $tree->visibleIds();
+        $brands = Brand::query()->active()->ordered()->get(['id', 'slug', 'updated_at']);
+
+        if ($brands->isNotEmpty()) {
+            $entries[] = ['urls' => LocalizedUrl::alternates('brands.index', fn (): array => []), 'lastmod' => null];
+        }
+
+        foreach ($brands as $brand) {
+            $entries[] = [
+                'urls' => LocalizedUrl::alternates('brands.show', fn (): array => ['brand' => $brand->slug]),
+                'lastmod' => $brand->updated_at,
+            ];
+        }
 
         foreach ($visibleIds as $categoryId) {
             $entries[] = [

@@ -226,9 +226,9 @@ function submit() {
                             <input v-model="form.site.font" type="radio" name="font" :value="font.value" class="size-4 accent-brass-500" />
                         </span>
                         <span class="flex flex-col gap-1 text-ink" :style="{ fontFamily: `var(--font-${font.value})` }">
-                            <span class="text-xl" dir="rtl" lang="ar">نُسق للبلاط والسيراميك</span>
-                            <span class="text-sm text-muted" dir="rtl" lang="ar">بلاط فاخر لمساحات استثنائية — 60 × 120 سم</span>
-                            <span class="text-sm text-muted" dir="ltr" lang="en">Premium tiles for exceptional spaces</span>
+                            <span class="text-xl" dir="rtl" lang="ar">نُسق للبلاط والأدوات الصحية</span>
+                            <span class="text-sm text-muted" dir="rtl" lang="ar">بلاط ورخام وأدوات صحية — 60 × 120 سم</span>
+                            <span class="text-sm text-muted" dir="ltr" lang="en">Premium tiles, marble and sanitary ware</span>
                         </span>
                     </label>
                 </div>

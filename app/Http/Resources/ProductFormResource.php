@@ -30,6 +30,7 @@ class ProductFormResource extends JsonResource
         return [
             'id' => $this->id,
             'category_id' => $this->category_id,
+            'brand_id' => $this->brand_id,
             'sku' => $this->sku,
             'status' => $this->status,
             'featured' => $this->featured,
@@ -42,6 +43,7 @@ class ProductFormResource extends JsonResource
             ]),
             'main_image' => $mainImage ? MediaResource::make($mainImage)->resolve($request) : null,
             'gallery' => MediaResource::collection($this->getMedia(Product::GALLERY_COLLECTION))->resolve($request),
+            'documents' => DocumentResource::collection($this->getMedia(Product::DOCUMENTS_COLLECTION))->resolve($request),
             'specifications' => $this->specifications->map(fn (ProductSpecification $specification): array => [
                 'id' => $specification->id,
                 ...collect($locales)->mapWithKeys(fn (string $locale): array => [

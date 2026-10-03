@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BrandResource;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResource;
+use App\Models\Brand;
 use App\Models\Company;
 use App\Models\Product;
 use App\Services\Catalog\CategoryTreeService;
@@ -13,6 +15,7 @@ use App\Support\LocalizedUrl;
 use App\Support\Seo\SeoMeta;
 use App\Support\Seo\StructuredData;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -35,12 +38,18 @@ class ProductController extends Controller
             ? $tree->subtreeIds($categoryId, activeOnly: true)
             : $visibleIds;
 
+        // Only brands with products in this listing are offered, so a filter never comes up empty.
+        $brands = Brand::query()->active()->withProductsIn($categoryIds)->ordered()->get();
+        $brand = $brands->firstWhere('slug', $request->string('brand')->value());
+
         $products = Product::query()
             ->active()
             ->inCategories($categoryIds)
+            ->when($brand, fn (Builder $query, Brand $brand) => $query->where('brand_id', $brand->id))
             ->when($request->string('q')->trim()->value(), fn (Builder $query, string $term) => $query->search($term))
             ->when($request->boolean('featured'), fn (Builder $query) => $query->featured())
             ->with(['translations', 'media'])
+            ->withVisibleBrand()
             ->ordered()
             ->paginate(config('catalog.per_page'))
             ->withQueryString();
@@ -48,14 +57,16 @@ class ProductController extends Controller
         return Inertia::render('Catalog/Index', [
             'seo' => SeoMeta::make()
                 ->title(__('Products'))
-                ->description(__('Explore our collections of porcelain, ceramic and natural-effect tiles for every space.'))
+                ->description(__('Explore our collections of tiles, marble and sanitary ware for every space.'))
                 // Filtered and searched listings repeat the catalog, so they stay out of search results.
-                ->noindex($request->filled('q') || $request->filled('category') || $request->boolean('featured')),
+                ->noindex($request->filled('q') || $request->filled('category') || $request->filled('brand') || $request->boolean('featured')),
             'categories' => CategoryResource::collection($tree->collections()->load('media')),
+            'brands' => BrandResource::collection($brands),
             'products' => ProductResource::collection($products),
             'filters' => [
                 'q' => $request->string('q')->trim()->value(),
                 'category' => $categoryId,
+                'brand' => $brand?->slug,
                 'featured' => $request->boolean('featured'),
             ],
             'breadcrumbs' => Breadcrumbs::forCatalog(),
@@ -87,13 +98,19 @@ class ProductController extends Controller
 
         abort_unless($tree->isVisible($product->category_id), 404);
 
-        $product->load(['translations', 'media', 'specifications.translations']);
+        $product->load([
+            'translations',
+            'media',
+            'specifications.translations',
+            'brand' => fn (BelongsTo $brand) => $brand->where('status', true)->with('media'),
+        ]);
 
         $relatedProducts = Product::query()
             ->active()
             ->where('category_id', $product->category_id)
             ->whereKeyNot($product->id)
             ->with(['translations', 'media'])
+            ->withVisibleBrand()
             ->ordered()
             ->limit(4)
             ->get();
@@ -111,7 +128,7 @@ class ProductController extends Controller
                 ->image($coverImage?->getAvailableFullUrl(['large']))
                 ->type('product')
                 ->alternates($localeUrls)
-                ->withStructuredData(StructuredData::product($product, Company::current()->name ?: config('app.name')))
+                ->withStructuredData(StructuredData::product($product, $product->brand?->name ?: (Company::current()->name ?: config('app.name'))))
                 ->withStructuredData(StructuredData::breadcrumbs($breadcrumbs)),
             'product' => ProductDetailResource::make($product),
             'relatedProducts' => ProductResource::collection($relatedProducts),

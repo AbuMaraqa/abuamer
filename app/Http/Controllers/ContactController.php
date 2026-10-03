@@ -30,7 +30,7 @@ class ContactController extends Controller
         return Inertia::render('Contact', [
             'seo' => SeoMeta::make()
                 ->title(__('Contact'))
-                ->description(__('Our team will help you choose the right tiles, sizes and finishes for your space.')),
+                ->description(__('Our team will help you choose the right tiles, sanitary ware and finishes for your project.')),
             'mapEmbedUrl' => $contact->map_embed_url ?: null,
             'workingHours' => Localized::value($contact->working_hours) ?: null,
             'subject' => $this->productInquirySubject($request->integer('product')),

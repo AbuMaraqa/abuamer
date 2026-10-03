@@ -15,6 +15,8 @@ enum Permission: string
     case ProductsUpdate = 'products.update';
     case ProductsDelete = 'products.delete';
 
+    case BrandsManage = 'brands.manage';
+
     case CompanyManage = 'company.manage';
     case MessagesManage = 'messages.manage';
     case SettingsManage = 'settings.manage';

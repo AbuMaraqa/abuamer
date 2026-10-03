@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Persists the complete state submitted by the product form: attributes and
- * translations, the ordered specifications, and the main image and gallery.
+ * translations, the ordered specifications, the main image and gallery, and the
+ * downloadable documents.
  */
 class ProductService
 {
@@ -18,6 +19,8 @@ class ProductService
      * @param  list<array{id: int|null, translations: array<string, array{label: string, value: string}>}>  $specifications
      * @param  list<int>  $keptGalleryIds  Existing gallery images to keep, in display order.
      * @param  list<UploadedFile>  $galleryUploads  New gallery images, appended after the kept ones.
+     * @param  list<int>  $keptDocumentIds  Existing documents to keep, in display order.
+     * @param  list<UploadedFile>  $documentUploads  New documents, appended after the kept ones.
      */
     public function save(
         Product $product,
@@ -27,6 +30,8 @@ class ProductService
         bool $removeMainImage = false,
         array $keptGalleryIds = [],
         array $galleryUploads = [],
+        array $keptDocumentIds = [],
+        array $documentUploads = [],
     ): Product {
         DB::transaction(function () use ($product, $attributes, $specifications) {
             $product->fillWithTranslations($attributes)->save();
@@ -36,6 +41,7 @@ class ProductService
 
         MediaSync::single($product, Product::MAIN_IMAGE_COLLECTION, $mainImage, $removeMainImage);
         MediaSync::gallery($product, Product::GALLERY_COLLECTION, $keptGalleryIds, $galleryUploads);
+        MediaSync::gallery($product, Product::DOCUMENTS_COLLECTION, $keptDocumentIds, $documentUploads);
 
         return $product;
     }

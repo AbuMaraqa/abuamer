@@ -11,6 +11,7 @@ defineProps({
     category: { type: Object, required: true },
     children: { type: Array, required: true },
     relatedCategories: { type: Array, required: true },
+    brands: { type: Array, required: true },
     products: { type: Object, required: true },
     filters: { type: Object, required: true },
     breadcrumbs: { type: Array, required: true },
@@ -45,7 +46,7 @@ const { t } = useTranslations();
                     <h2 class="font-display text-2xl text-ink sm:text-3xl">{{ t('Products') }}</h2>
                     <p class="mt-2 text-sm text-muted" aria-live="polite">{{ t(':count products', { count: products.meta.total }) }}</p>
                 </div>
-                <ProductFilters :filters="filters" :url="category.url" />
+                <ProductFilters :filters="filters" :url="category.url" :brands="brands" />
             </div>
 
             <ProductGrid :products="products.data">

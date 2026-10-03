@@ -31,6 +31,7 @@ enum Role: string
                 Permission::ProductsCreate,
                 Permission::ProductsUpdate,
                 Permission::ProductsDelete,
+                Permission::BrandsManage,
                 Permission::CompanyManage,
                 Permission::MessagesManage,
             ],

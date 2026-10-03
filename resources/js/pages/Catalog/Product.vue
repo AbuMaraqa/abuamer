@@ -1,9 +1,11 @@
 <script setup>
-import { usePage } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { route } from 'ziggy-js';
 import AppBreadcrumbs from '../../components/breadcrumbs/AppBreadcrumbs.vue';
+import BrandLogo from '../../components/brands/BrandLogo.vue';
 import AppButton from '../../components/common/AppButton.vue';
+import Icon from '../../components/common/Icon.vue';
 import SocialIcon from '../../components/common/SocialIcon.vue';
 import ProductGallery from '../../components/products/ProductGallery.vue';
 import ProductGrid from '../../components/products/ProductGrid.vue';
@@ -20,10 +22,11 @@ const { t } = useTranslations();
 const whatsapp = usePage().props.site.contact.whatsapp;
 
 /**
- * A WhatsApp chat that opens with a message naming this product, its code and its link.
+ * A WhatsApp chat that opens with a message naming this product, its brand, its code and its link.
  */
 const whatsAppUrl = computed(() => {
-    const name = props.product.sku ? `${props.product.name} (${props.product.sku})` : props.product.name;
+    const title = props.product.brand ? `${props.product.brand.name} – ${props.product.name}` : props.product.name;
+    const name = props.product.sku ? `${title} (${props.product.sku})` : title;
     const text = `${t('Hello, I would like to ask about :name', { name })}\n${props.product.url}`;
 
     return `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
@@ -66,6 +69,21 @@ onBeforeUnmount(() => observer?.disconnect());
                     </p>
                 </div>
 
+                <Link
+                    v-if="product.brand"
+                    :href="product.brand.url"
+                    class="group inline-flex items-center gap-3 self-start rounded-xl border border-line bg-white py-2 ps-3 pe-4 transition-colors hover:border-sand-400"
+                >
+                    <span class="flex h-9 max-w-32 items-center text-lg">
+                        <BrandLogo :brand="product.brand" image-class="max-h-9" />
+                    </span>
+                    <span class="h-6 w-px bg-line" aria-hidden="true" />
+                    <span class="flex items-center gap-1.5 text-xs text-muted transition-colors group-hover:text-ink">
+                        {{ t('More from this brand') }}
+                        <Icon name="arrow-right" :size="14" />
+                    </span>
+                </Link>
+
                 <p v-if="product.short_description" class="text-base leading-relaxed text-ink-soft">{{ product.short_description }}</p>
 
                 <!-- Prices are given on request, so asking about the product is the main action here. -->
@@ -91,6 +109,29 @@ onBeforeUnmount(() => observer?.disconnect());
                 <div v-if="product.description" class="flex flex-col gap-3">
                     <h2 class="text-sm font-semibold text-ink">{{ t('Description') }}</h2>
                     <p class="text-sm leading-loose whitespace-pre-line text-ink-soft">{{ product.description }}</p>
+                </div>
+
+                <div v-if="product.documents.length > 0" class="flex flex-col gap-4">
+                    <h2 class="text-sm font-semibold text-ink">{{ t('Downloads') }}</h2>
+                    <ul class="grid gap-2.5 sm:grid-cols-2">
+                        <li v-for="document in product.documents" :key="document.id">
+                            <a
+                                :href="document.url"
+                                target="_blank"
+                                rel="noopener"
+                                class="group flex items-center gap-3 rounded-xl border border-line bg-white p-3 transition-colors hover:border-sand-400"
+                            >
+                                <span class="flex size-11 shrink-0 items-center justify-center rounded-lg bg-sand-100 text-brass-700">
+                                    <Icon name="file-text" :size="20" />
+                                </span>
+                                <span class="min-w-0 grow">
+                                    <span class="block truncate text-sm font-medium text-ink" dir="auto">{{ document.name }}</span>
+                                    <span class="block text-xs text-muted" dir="ltr">{{ document.extension }} · {{ document.size }}</span>
+                                </span>
+                                <Icon name="download" :size="18" class="shrink-0 text-muted transition-colors group-hover:text-ink" />
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
